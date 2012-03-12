@@ -28,8 +28,41 @@ License
 ``Flask-And-Redis`` is licensed under the `BSD License
 <https://github.com/playpauseandstop/Flask-And-Redis/blob/master/LICENSE>`_.
 
+Configuration
+=============
+
+As of ``py-redis`` 2.4.11 release you should setup next options in your
+settings module:
+
+* ``REDIS_HOST``
+* ``REDIS_PORT``
+* ``REDIS_DB``
+* ``REDIS_PASSWORD``
+* ``REDIS_SOCKET_TIMEOUT``
+* ``REDIS_CONNECTION_POOL``
+* ``REDIS_CHARSET``
+* ``REDIS_ERRORS``
+* ``REDIS_UNIX_SOCKET_PATH``
+
+Then all of these args would be sent to ``redis.Redis.__init__`` method.
+
 Usage
 =====
+
+Basic
+-----
+
+::
+
+    from flask import Flask
+    from flask.ext.redis import Redis
+
+
+    app = Flask(__name__)
+    redis = Redis(app)
+
+Test application
+----------------
 
 ``testapp/app.py``
 
