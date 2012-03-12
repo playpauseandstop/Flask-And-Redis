@@ -20,13 +20,21 @@ setup(
     author='Igor Davydenko',
     author_email='playpauseandstop@gmail.com',
     url='https://github.com/playpauseandstop/Flask-And-Redis',
+    install_requires=[
+        'Flask',
+    ],
     packages=[
         'flask_redis',
     ],
+    platforms='any',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
+        'Operating System :: OS Independent',
         'Topic :: Utilities',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: BSD License',
     ],
     keywords='flask redis',
