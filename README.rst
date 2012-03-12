@@ -1,0 +1,87 @@
+===============
+Flask-And-Redis
+===============
+
+Simple as dead support of Redis database for Flask apps.
+
+.. note:: I named this ``Flask-And-Redis``, cause ``Flask-Redis`` name already
+   `taken <http://pypi.python.org/pypi/Flask-Redis>`_, but that library didn't
+   match my needs.
+
+Requirements
+============
+
+* `Python <http://www.python.org>`_ 2.6 or higher
+* `Flask <http://flask.pocoo.org/>`_ 0.8 or higher
+* `redis-py <https://github.com/andymccurdy/redis-py>`_ 2.4 or higher
+
+Installation
+============
+
+::
+
+    $ pip install Flask-And-Redis
+
+License
+=======
+
+``Flask-And-Redis`` is licensed under the `BSD License
+<https://github.com/playpauseandstop/Flask-And-Redis/blob/master/LICENSE>`_.
+
+Usage
+=====
+
+``testapp/app.py``
+
+::
+
+    from flask import Flask, redirect, url_for
+    from flask.ext.redis import Redis
+
+    from testapp import settings
+
+
+    # Initialize simple Flask application
+    app = Flask(__name__)
+    app.config.from_object(settings)
+
+    # Setup Redis conection
+    redis = Redis(app)
+
+    # Add two simple views: One for forgetting counter
+    @app.route('/forget-us')
+    def forget_us():
+        key = app.config['COUNTER_KEY']
+        redis.delete(key)
+        return redirect(url_for('home'))
+
+
+    # Second for remembering visiting counter
+    @app.route('/')
+    def home():
+        key = app.config['COUNTER_KEY']
+        counter = redis.incr(key)
+        message = 'Hello, visitor!'
+
+        if counter != 1:
+            message += "\nThis page viewed %d time(s)." % counter
+
+        return message
+
+----
+
+``testapp/settings.py``
+
+::
+
+    COUNTER_KEY = 'testapp:counter'
+    REDIS_HOST = 'localhost'
+    REDIS_PORT = 6379
+    REDIS_DB = 0
+
+Bugs, feature requests?
+=======================
+
+If you found some bug in ``Flask-And-Redis`` library, please, add new issue to
+the project's `GitHub issues
+<https://github.com/playpauseandstop/Flask-And-Redis/issues>`_.

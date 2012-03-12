@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+
+build/
+dist/
+testapp/env/
+
+MANIFEST
