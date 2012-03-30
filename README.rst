@@ -118,3 +118,17 @@ Bugs, feature requests?
 If you found some bug in ``Flask-And-Redis`` library, please, add new issue to
 the project's `GitHub issues
 <https://github.com/playpauseandstop/Flask-And-Redis/issues>`_.
+
+Changelog
+=========
+
+0.2
+---
+
++ Added support of ``REDIS_URL`` setting. By default, ``Redis`` will try to
+  guess host, port, user, password and db settings from that value.
+
+0.1
+---
+
+* Initial release.
