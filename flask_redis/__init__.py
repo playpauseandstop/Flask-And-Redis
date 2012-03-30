@@ -45,6 +45,7 @@ class Redis(BaseRedis):
             REDIS_URL = os.environ.get('REDISTOGO_URL', REDIS_URL)
 
         """
+        converters = {'port': int}
         url = app.config.get('REDIS_URL')
 
         if url:
@@ -70,7 +71,12 @@ class Redis(BaseRedis):
             if not redis_arg in app.config:
                 continue
 
-            kwargs.update({arg: app.config.get(redis_arg)})
+            value = app.config.get(redis_arg)
+
+            if arg in converters:
+                value = converters[arg](value)
+
+            kwargs.update({arg: value})
 
         super(Redis, self).__init__(**kwargs)
         setattr(self, '_flask_app', app)

@@ -80,6 +80,12 @@ class TestFlaskRedis(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, 'Hello, visitor!')
 
+    def test_default_behaviour_string_port(self):
+        app.config['REDIS_PORT'] = str(app.config['REDIS_PORT'])
+
+        obj = Redis(app)
+        obj.ping()
+
     def test_default_behaviour_url(self):
         host = app.config.pop('REDIS_HOST')
         port = app.config.pop('REDIS_PORT')
