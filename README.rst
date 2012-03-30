@@ -122,10 +122,14 @@ the project's `GitHub issues
 Changelog
 =========
 
+0.2.1
+-----
+
++ Convert ``REDIS_PORT`` to an ``int`` instance.
+
 0.2
 ---
 
-+ Convert ``REDIS_PORT`` to an ``int`` instance.
 + Added support of ``REDIS_URL`` setting. By default, ``Redis`` will try to
   guess host, port, user, password and db settings from that value.
 
