@@ -33,6 +33,8 @@ class TestFlaskRedis(unittest.TestCase):
     def tearDown(self):
         redis.delete(app.config['COUNTER_KEY'])
 
+        app.config.pop('REDIS_URL', None)
+
         app.config['COUNTER_KEY'] = self.old_COUNTER_KEY
         app.config['REDIS_HOST'] = self.old_REDIS_HOST
         app.config['REDIS_PORT'] = self.old_REDIS_PORT
