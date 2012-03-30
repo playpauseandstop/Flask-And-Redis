@@ -1,4 +1,5 @@
 import inspect
+import urlparse
 
 from redis import Redis as BaseRedis
 
@@ -14,7 +15,7 @@ class Redis(BaseRedis):
     def __init__(self, app):
         """
         Overwrite default ``Redis.__init__`` method, read all necessary
-        settings from Flask app instead of positional and keyword args.
+        settings from Flask app config instead of positional and keyword args.
 
         The possible settings are:
 
@@ -28,7 +29,37 @@ class Redis(BaseRedis):
         * REDIS_ERRORS
         * REDIS_UNIX_SOCKET_PATH
 
+        Advanced usage
+        --------------
+
+        Also if you want to use this extension on Heroku or other build
+        services where redis URL stored in environment var you could to
+        determine full URL to redis server.
+
+        For example for Heroku apps which used ``REDIS_TO_GO`` environ app,
+        you'll need to update your project settings with::
+
+            import os
+
+            REDIS_URL = 'redis://localhost:6379/0'
+            REDIS_URL = os.environ.get('REDIS_TO_GO', REDIS_URL)
+
         """
+        url = app.config.get('REDIS_URL')
+
+        if url:
+            urlparse.uses_netloc.append('redis')
+            url = urlparse.urlparse(url)
+
+            # URL could contains host, port, user, password and db
+            # values. Store their to config
+            app.config['REDIS_HOST'] = url.hostname
+            app.config['REDIS_PORT'] = url.port
+            app.config['REDIS_USER'] = url.username
+            app.config['REDIS_PASSWORD'] = url.password
+            app.config['REDIS_DB'] = \
+                url.path if url.path.isdigit() else None
+
         spec = inspect.getargspec(BaseRedis.__init__)
         args = set(spec.args).difference(set(['self']))
         kwargs = {}

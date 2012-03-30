@@ -18,6 +18,9 @@ class TestFlaskRedis(unittest.TestCase):
 
     def setUp(self):
         self.old_COUNTER_KEY = app.config['COUNTER_KEY']
+        self.old_REDIS_HOST = app.config['REDIS_HOST']
+        self.old_REDIS_PORT = app.config['REDIS_PORT']
+        self.old_REDIS_DB = app.config['REDIS_DB']
 
         app.config['COUNTER_KEY'] += '_test'
         app.config['TESTING'] = True
@@ -31,6 +34,9 @@ class TestFlaskRedis(unittest.TestCase):
         redis.delete(app.config['COUNTER_KEY'])
 
         app.config['COUNTER_KEY'] = self.old_COUNTER_KEY
+        app.config['REDIS_HOST'] = self.old_REDIS_HOST
+        app.config['REDIS_PORT'] = self.old_REDIS_PORT
+        app.config['REDIS_DB'] = self.old_REDIS_DB
         app.config['TESTING'] = False
 
     def url(self, *args, **kwargs):
@@ -41,6 +47,12 @@ class TestFlaskRedis(unittest.TestCase):
         app.config['REDIS_HOST'] = 'wrong-host'
         app.config['REDIS_PORT'] = 8080
         app.config['REDIS_DB'] = 0
+
+        obj = Redis(app)
+        self.assertRaises(ConnectionError, obj.ping)
+
+    def test_custom_behaviour_url(self):
+        app.config['REDIS_URL'] = 'redis://wrong-host:8080/0'
 
         obj = Redis(app)
         self.assertRaises(ConnectionError, obj.ping)
@@ -67,6 +79,16 @@ class TestFlaskRedis(unittest.TestCase):
         response = self.app.get(self.home_url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, 'Hello, visitor!')
+
+    def test_default_behaviour_url(self):
+        host = app.config.pop('REDIS_HOST')
+        port = app.config.pop('REDIS_PORT')
+        db = app.config.pop('REDIS_DB')
+
+        app.config['REDIS_URL'] = 'redis://%s:%d/%d' % (host, port, db)
+
+        obj = Redis(app)
+        obj.ping()
 
 
 if __name__ == '__main__':
