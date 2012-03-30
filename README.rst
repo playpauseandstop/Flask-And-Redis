@@ -46,6 +46,14 @@ settings module:
 
 Then all of these args would be sent to ``redis.Redis.__init__`` method.
 
+Advanced
+--------
+
+Some times, your redis setting stored as ``redis://...`` url (like in Heroku
+or DotCloud services), sou you could to provide just ``REDIS_URL`` value
+and ``Flask-And-Redis`` auto parsed that url and configured then valid redis
+connection.
+
 Usage
 =====
 
@@ -111,6 +119,7 @@ Test application
     REDIS_HOST = 'localhost'
     REDIS_PORT = 6379
     REDIS_DB = 0
+    # REDIS_URL = 'redis://localhost:6379/0'
 
 Bugs, feature requests?
 =======================
