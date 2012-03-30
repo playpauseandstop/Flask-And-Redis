@@ -36,13 +36,13 @@ class Redis(BaseRedis):
         services where redis URL stored in environment var you could to
         determine full URL to redis server.
 
-        For example for Heroku apps which used ``REDIS_TO_GO`` environ app,
+        For example for Heroku apps which used ``REDISTOGO_URL`` environ app,
         you'll need to update your project settings with::
 
             import os
 
             REDIS_URL = 'redis://localhost:6379/0'
-            REDIS_URL = os.environ.get('REDIS_TO_GO', REDIS_URL)
+            REDIS_URL = os.environ.get('REDISTOGO_URL', REDIS_URL)
 
         """
         url = app.config.get('REDIS_URL')
