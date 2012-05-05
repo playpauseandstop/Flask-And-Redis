@@ -1,30 +1,22 @@
 #!/usr/bin/env python
 
-import os
-
-from distutils.core import setup
-
-
-DIRNAME = os.path.dirname(__file__)
-
-readme = open(os.path.join(DIRNAME, 'README.rst'), 'r')
-README = readme.read()
-readme.close()
-
+from setuptools import setup
 
 setup(
     name='Flask-And-Redis',
     version='0.2.1',
     description='Simple as dead support of Redis database for Flask apps.',
     long_description=README,
-    author='Igor Davydenko',
-    author_email='playpauseandstop@gmail.com',
-    url='https://github.com/playpauseandstop/Flask-And-Redis',
+    author='Lexo Charles',
+    author_email='lexo.charles@gmail.com',
+    url='https://github.com/sixpoint/Flask-And-Redis',
     install_requires=[
+        'setuptools',
         'Flask',
     ],
     packages=[
-        'flask_redis',
+        'flaskext',
+        'flaskext.redis',
     ],
     platforms='any',
     classifiers=[
