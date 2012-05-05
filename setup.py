@@ -4,9 +4,9 @@ from setuptools import setup
 
 setup(
     name='Flask-And-Redis',
-    version='0.2.1',
-    description='Simple as dead support of Redis database for Flask apps.',
-    long_description=README,
+    version='0.3.0',
+    description='A flaskext: simple as dead support of Redis database for Flask apps.',
+    long_description='README',
     author='Lexo Charles',
     author_email='lexo.charles@gmail.com',
     url='https://github.com/sixpoint/Flask-And-Redis',

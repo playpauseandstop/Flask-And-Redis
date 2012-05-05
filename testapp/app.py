@@ -4,18 +4,19 @@ import os
 import sys
 
 from flask import Flask, redirect, url_for
-from flask.ext.redis import Redis
+# from flask.ext.redis import Redis
+from flaskext.redis import Redis
 
 import settings
 
 
+redis = Redis()
 # Initialize simple Flask application
 app = Flask(__name__)
 app.config.from_object(settings)
 
 # Setup Redis conection
-redis = Redis(app)
-
+redis.init_app(app)
 
 # Add two simple views: One for forgetting counter
 @app.route('/forget-us')
