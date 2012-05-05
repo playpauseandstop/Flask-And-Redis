@@ -4,7 +4,7 @@ import urlparse
 from redis import Redis as BaseRedis
 
 
-__all__ = ('Redis', )
+# __all__ = ('Redis', )
 
 
 class Redis(BaseRedis):
@@ -12,7 +12,14 @@ class Redis(BaseRedis):
     Simple object to initialize redis client using settings from Flask
     application.
     """
-    def __init__(self, app):
+    def __init__(self, app=None):
+        if app is not None:
+            self.app = app
+            self.init_app(self.app)
+        else:
+            self.app = None
+
+    def init_app(self, app):
         """
         Overwrite default ``Redis.__init__`` method, read all necessary
         settings from Flask app config instead of positional and keyword args.

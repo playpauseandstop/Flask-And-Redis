@@ -69,6 +69,14 @@ Basic
     app = Flask(__name__)
     redis = Redis(app)
 
+You may also set up your Redis instance later at configuration time using init_app method:  
+
+::
+    redis = Redis()
+
+    app = Flask(__name__)
+    redis.init_app(app)
+
 Test application
 ----------------
 
