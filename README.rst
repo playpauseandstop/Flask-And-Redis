@@ -148,6 +148,11 @@ the project's `GitHub issues
 Changelog
 =========
 
+0.3
+---
+
++ Implement ``init_app`` method.
+
 0.2.1
 -----
 
