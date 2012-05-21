@@ -46,6 +46,23 @@ settings module:
 
 Then all of these args would be sent to ``redis.Redis.__init__`` method.
 
+You also could pass app into initialized instance afterwards with ``init_app``
+method::
+
+    from flask import Flask
+    from flask.ext.redis import Redis
+
+
+    app = Flask(__name__)
+
+    redis = Redis()
+    redis.init_app(app)
+
+.. warning:: Please note, if you'll initialize extension that way, make sure
+   that before ``init_app`` call all real Redis method's would be return
+   ``AttributeError`` exception cause of no ``connection_pool`` attribute,
+   which setup on ``redis.Redis`` instance init.
+
 Advanced
 --------
 

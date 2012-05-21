@@ -12,7 +12,7 @@ class Redis(BaseRedis):
     Simple object to initialize redis client using settings from Flask
     application.
     """
-    def __init__(self, app):
+    def __init__(self, app=None):
         """
         Overwrite default ``Redis.__init__`` method, read all necessary
         settings from Flask app config instead of positional and keyword args.
@@ -29,14 +29,30 @@ class Redis(BaseRedis):
         * REDIS_ERRORS
         * REDIS_UNIX_SOCKET_PATH
 
+        You also could initialize ``Redis`` instance without sending ``app``
+        object, but do this after with ``init_app`` method, like::
+
+            from flask import Flask
+            from flask.ext.redis import Redis
+
+            app = Flask(__name__)
+
+            redis = Redis()
+            redis.init_app(app)
+
+        .. warning:: Please note, if you'll initialize extension that way, make
+           sure that before ``init_app`` call all real Redis method's would be
+           return ``AttributeError`` exception cause of no ``connection_pool``
+           attribute, which setup on ``Redis`` instance init.
+
         Advanced usage
         --------------
 
-        Also if you want to use this extension on Heroku or other build
-        services where redis URL stored in environment var you could to
-        determine full URL to redis server.
+        If you want to use this extension on Heroku or other build services
+        where redis URL stored in environment var you could to determine full
+        URL to redis server.
 
-        For example for Heroku apps which used ``REDISTOGO_URL`` environ app,
+        For example, for Heroku apps which used ``REDISTOGO_URL`` environ app,
         you'll need to update your project settings with::
 
             import os
@@ -44,6 +60,13 @@ class Redis(BaseRedis):
             REDIS_URL = 'redis://localhost:6379/0'
             REDIS_URL = os.environ.get('REDISTOGO_URL', REDIS_URL)
 
+        """
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """
+        Actual method to read redis settings from app configuration.
         """
         converters = {'port': int}
         url = app.config.get('REDIS_URL')
