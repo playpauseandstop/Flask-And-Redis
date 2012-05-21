@@ -53,10 +53,30 @@ class TestFlaskRedis(unittest.TestCase):
         obj = Redis(app)
         self.assertRaises(ConnectionError, obj.ping)
 
+    def test_custom_behaviour_init_app(self):
+        app.config['REDIS_HOST'] = 'wrong-host'
+        app.config['REDIS_PORT'] = 8080
+        app.config['REDIS_DB'] = 0
+
+        obj = Redis()
+        self.assertRaises(AttributeError, obj.ping)
+
+        obj.init_app(app)
+        self.assertRaises(ConnectionError, obj.ping)
+
     def test_custom_behaviour_url(self):
         app.config['REDIS_URL'] = 'redis://wrong-host:8080/0'
 
         obj = Redis(app)
+        self.assertRaises(ConnectionError, obj.ping)
+
+    def test_custom_behaviour_url_init_app(self):
+        app.config['REDIS_URL'] = 'redis://wrong-host:8080/0'
+
+        obj = Redis()
+        self.assertRaises(AttributeError, obj.ping)
+
+        obj.init_app(app)
         self.assertRaises(ConnectionError, obj.ping)
 
     def test_default_behaviour(self):
@@ -96,6 +116,19 @@ class TestFlaskRedis(unittest.TestCase):
         app.config['REDIS_URL'] = 'redis://%s:%d/%d' % (host, port, db)
 
         obj = Redis(app)
+        obj.ping()
+
+    def test_default_behaviour_url_init_app(self):
+        host = app.config.pop('REDIS_HOST')
+        port = app.config.pop('REDIS_PORT')
+        db = app.config.pop('REDIS_DB')
+
+        app.config['REDIS_URL'] = 'redis://%s:%d/%d' % (host, port, db)
+
+        obj = Redis()
+        self.assertRaises(AttributeError, obj.ping)
+
+        obj.init_app(app)
         obj.ping()
 
 
