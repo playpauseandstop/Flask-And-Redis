@@ -148,6 +148,13 @@ the project's `GitHub issues
 Changelog
 =========
 
+0.3.1
+-----
+
++ Move from ``flask_redis`` package to python module.
++ Little improvements for storing ``_flask_app`` attribute to ``Redis``
+  instance.
+
 0.3
 ---
 
