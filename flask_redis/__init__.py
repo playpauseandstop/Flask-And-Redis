@@ -64,6 +64,8 @@ class Redis(BaseRedis):
         if app is not None:
             self.init_app(app)
 
+        setattr(self, '_flask_app', app)
+
     def init_app(self, app):
         """
         Actual method to read redis settings from app configuration.
@@ -102,4 +104,3 @@ class Redis(BaseRedis):
             kwargs.update({arg: value})
 
         super(Redis, self).__init__(**kwargs)
-        setattr(self, '_flask_app', app)
