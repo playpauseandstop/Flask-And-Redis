@@ -23,7 +23,7 @@ setup(
     install_requires=[
         'Flask',
     ],
-    packages=[
+    py_modules=[
         'flask_redis',
     ],
     platforms='any',
