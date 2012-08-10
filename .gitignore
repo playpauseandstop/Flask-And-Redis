@@ -4,5 +4,6 @@
 build/
 dist/
 testapp/env/
+testapp/env-2.4/
 
 MANIFEST
