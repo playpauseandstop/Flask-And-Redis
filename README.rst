@@ -148,6 +148,12 @@ the project's `GitHub issues
 Changelog
 =========
 
+0.3.2
+-----
+
++ Checked compability with ``redis-py`` version 2.6.0.
++ Added ``redis`` as install requirement in ``setup.py``.
+
 0.3.1
 -----
 
