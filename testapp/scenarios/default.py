@@ -36,7 +36,6 @@ def convert_scenario(scenario):
         return result
 
     convert_args = {
-        'getrange': lambda args: ['getrange'] + args,
         'hmget': lambda args: [args[0], args[1:]],
         'hmset': convert_hmset_args,
         'zadd': convert_zadd_args,
@@ -48,9 +47,8 @@ def convert_scenario(scenario):
     result = []
 
     if redis.__version__.startswith('2.4'):
-        convert_cmds.update({
-            'getrange': 'execute_command',
-        })
+        convert_args.update({'getrange': lambda args: ['getrange'] + args})
+        convert_cmds.update({'getrange': 'execute_command'})
 
     for line in scenario.splitlines():
         arg, args, ignore_whitespace = '', [], False

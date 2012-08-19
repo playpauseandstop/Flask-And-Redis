@@ -12,6 +12,7 @@ from flask.ext.redis import Redis
 from redis.exceptions import ConnectionError
 
 from app import app, redis
+from scenarios.default import SCENARIO
 
 
 class TestCase(unittest.TestCase):
@@ -136,6 +137,11 @@ class TestViews(TestCase):
         self.assertIn('&gt; redis.ping()', response.data)
         self.assertIn('True', response.data)
         self.assertIn('&gt; redis.info()', response.data)
+
+    def test_default(self):
+        data = {'scenario': SCENARIO, 'scenario_type': 'redis'}
+        response = self.app.post(self.test_url, data=data)
+        self.assertIn('<h2>Scenario successfully executed</h2>', response.data)
 
     def test_test_errors(self):
         response = self.app.post(self.test_url, data={})
