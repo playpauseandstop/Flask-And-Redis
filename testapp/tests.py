@@ -14,28 +14,19 @@ from redis.exceptions import ConnectionError
 from app import app, redis
 
 
-class TestFlaskRedis(unittest.TestCase):
+class TestCase(unittest.TestCase):
 
     def setUp(self):
-        self.old_COUNTER_KEY = app.config['COUNTER_KEY']
         self.old_REDIS_HOST = app.config['REDIS_HOST']
         self.old_REDIS_PORT = app.config['REDIS_PORT']
         self.old_REDIS_DB = app.config['REDIS_DB']
 
-        app.config['COUNTER_KEY'] += '_test'
         app.config['TESTING'] = True
-
         self.app = app.test_client()
 
-        self.forget_us_url = self.url('forget_us')
-        self.home_url = self.url('home')
-
     def tearDown(self):
-        redis.delete(app.config['COUNTER_KEY'])
-
         app.config.pop('REDIS_URL', None)
 
-        app.config['COUNTER_KEY'] = self.old_COUNTER_KEY
         app.config['REDIS_HOST'] = self.old_REDIS_HOST
         app.config['REDIS_PORT'] = self.old_REDIS_PORT
         app.config['REDIS_DB'] = self.old_REDIS_DB
@@ -44,6 +35,9 @@ class TestFlaskRedis(unittest.TestCase):
     def url(self, *args, **kwargs):
         with app.test_request_context():
             return url_for(*args, **kwargs)
+
+
+class TestFlaskRedis(TestCase):
 
     def test_custom_behaviour(self):
         app.config['REDIS_HOST'] = 'wrong-host'
@@ -79,29 +73,6 @@ class TestFlaskRedis(unittest.TestCase):
         obj.init_app(app)
         self.assertRaises(ConnectionError, obj.ping)
 
-    def test_default_behaviour(self):
-        response = self.app.get(self.home_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, 'Hello, visitor!')
-
-        response = self.app.get(self.home_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data, 'Hello, visitor!\nThis page viewed 2 time(s).'
-        )
-
-        self.assertTrue(redis.exists(app.config['COUNTER_KEY']))
-
-        response = self.app.get(self.forget_us_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(response.headers['Location'].endswith(self.home_url))
-
-        self.assertFalse(redis.exists(app.config['COUNTER_KEY']))
-
-        response = self.app.get(self.home_url)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, 'Hello, visitor!')
-
     def test_default_behaviour_string_port(self):
         app.config['REDIS_PORT'] = str(app.config['REDIS_PORT'])
 
@@ -130,6 +101,75 @@ class TestFlaskRedis(unittest.TestCase):
 
         obj.init_app(app)
         obj.ping()
+
+
+class TestViews(TestCase):
+
+    def setUp(self):
+        super(TestViews, self).setUp()
+
+        self.home_url = self.url('home')
+        self.test_url = self.url('test')
+
+    def test_home(self):
+        response = self.app.get(self.home_url)
+        self.assertIn('<h1>Flask-And-Redis test project</h1>', response.data)
+
+        self.assertIn('>Redis information</h2>', response.data)
+        self.assertIn('>Server</th>', response.data)
+        self.assertIn('>Clients</th>', response.data)
+        self.assertIn('>Memory</th>', response.data)
+        self.assertIn('>Stats</th>', response.data)
+        self.assertIn('>CPU</th>', response.data)
+        self.assertIn('>Other</th>', response.data)
+
+        self.assertIn('>Test Redis server</h2>', response.data)
+        self.assertIn('>Scenario type</label>', response.data)
+        self.assertIn('>Scenario</label>', response.data)
+
+    def test_test(self):
+        data = {'scenario': 'ping\ninfo', 'scenario_type': 'redis'}
+        response = self.app.post(self.test_url, data=data)
+        self.assertIn('<h1>Flask-And-Redis test project</h1>', response.data)
+
+        self.assertIn('<h2>Scenario successfully executed</h2>', response.data)
+        self.assertIn('&gt; redis.ping()', response.data)
+        self.assertIn('True', response.data)
+        self.assertIn('&gt; redis.info()', response.data)
+
+    def test_test_errors(self):
+        response = self.app.post(self.test_url, data={})
+        self.assertIn('<h1>Flask-And-Redis test project</h1>', response.data)
+
+        self.assertIn('>Error</h2>', response.data)
+        self.assertIn(
+            'One of required fields is not set. Please, check POST request '
+            'or try again later.',
+            response.data
+        )
+
+        data = {'scenario': 'pong', 'scenario_type': 'redis'}
+        response = self.app.post(self.test_url, data=data)
+
+        self.assertIn('>Error</h2>', response.data)
+        self.assertIn(
+            'Cannot convert redis scenario to Python, error is: ',
+            response.data
+        )
+
+        data = {'scenario': 'redis.pong()', 'scenario_type': 'python'}
+        response = self.app.post(self.test_url, data=data)
+
+        self.assertIn('>Error</h2>', response.data)
+        self.assertIn(
+            'Error while executing Python scenario, error is: ',
+            response.data
+        )
+
+    def test_test_redirect(self):
+        response = self.app.get(self.test_url)
+        self.assertEqual(response._status_code, 302)
+        self.assertEqual(response.location, self.url('home', _external=True))
 
 
 if __name__ == '__main__':

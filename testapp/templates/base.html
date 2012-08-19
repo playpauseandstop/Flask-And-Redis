@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>{% block title %}Flask-And-Redis test project{% endblock %}</title>
+
+  <link href="{{ url_for("static", filename="css/screen.css") }}" media="screen,projection,tv" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+
+  <header>
+    <h1>{{ self.title() }}</h1>
+    <div class="github">
+      <a class="github-ribbon" href="https://github.com/playpauseandstop/Flask-And-Redis" title="Fork me on GitHub">
+        <img src="{{ url_for("static", filename="img/github.png") }}" alt="Fork me on GitHub">
+      </a>
+    </div>
+  </header>
+
+  <hr>
+
+  {% block content %}{% endblock %}
+
+</body>
+
+</html>

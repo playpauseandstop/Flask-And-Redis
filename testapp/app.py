@@ -3,10 +3,13 @@
 import os
 import sys
 
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.redis import Redis
 
 import settings
+
+from scenarios.default import SCENARIO, convert_scenario
+from scenarios.run import run_scenario
 
 
 # Initialize simple Flask application
@@ -17,25 +20,52 @@ app.config.from_object(settings)
 redis = Redis(app)
 
 
-# Add two simple views: One for forgetting counter
-@app.route('/forget-us')
-def forget_us():
-    key = app.config['COUNTER_KEY']
-    redis.delete(key)
-    return redirect(url_for('home'))
-
-
-# Second for remembering visiting counter
 @app.route('/')
 def home():
-    key = app.config['COUNTER_KEY']
-    counter = redis.incr(key)
-    message = 'Hello, visitor!'
+    """
+    Show basic information about server and add form to test server.
+    """
+    context = {
+        'info': redis.info(),
+        'scenario_python': convert_scenario(SCENARIO),
+        'scenario_redis': SCENARIO,
+    }
 
-    if counter != 1:
-        message += "\nThis page viewed %d time(s)." % counter
+    return render_template('index.html', **context)
 
-    return message
+
+@app.route('/test', methods=('GET', 'POST'))
+def test():
+    """
+    Test Redis server, using scenario from POST request.
+    """
+    if request.method == 'GET':
+        return redirect(url_for('home'))
+
+    scenario_type = request.form.get('scenario_type')
+    scenario = request.form.get('scenario')
+
+    if not scenario or not scenario_type:
+        return render_template('test.html', error='required_field')
+
+    if scenario_type == 'redis':
+        try:
+            scenario = convert_scenario(scenario)
+        except ValueError as e:
+            return render_template('test.html', error='convert', exception=e)
+
+    try:
+        results = run_scenario(redis, scenario)
+    except Exception as e:
+        return render_template('test.html', error='exception', exception=e)
+
+    context = {
+        'results': results,
+        'scenario': scenario,
+        'scenario_type': scenario_type,
+    }
+
+    return render_template('test.html', **context)
 
 
 if __name__ == '__main__':

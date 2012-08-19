@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if error %}
+  <h2>Error</h2>
+  <p>{% if error == "required_field" %}
+    One of required fields is not set. Please, check POST request or try again later.
+  {% elif error == "convert" %}
+    Cannot convert redis scenario to Python, error is: {{ exception }}.
+  {% elif error == "exception" %}
+    Error while executing Python scenario, error is: {{ exception }}.
+  {% endif %}</p>
+  {% else %}
+  <h2>Scenario successfully executed</h2>
+  {% if scenario_type == "redis" %}
+  <p>
+    <strong>Note:</strong>
+    Before executing, your redis scenario was converted to Python statements.
+  </p>
+  {% endif %}
+  <pre><code>{% for line, result in results.results %}&gt; {{ line }}
+{{ result|pprint }}
+{% endfor %}</code></pre>
+  <p>Execution time: {{ results.time }} ms.</p>
+  {% endif %}
+  <hr>
+  <p>&laquo; <a href="{{ url_for("home") }}">Back to index page</a></p>
+{% endblock %}

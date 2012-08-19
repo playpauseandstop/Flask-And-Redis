@@ -1,0 +1,30 @@
+set users:leto "{name: leto, planet: dune, likes: [spice]}"
+strlen users:leto
+getrange users:leto 27 40
+append users:leto " OVER 9000!!"
+incr stats:page:about
+incr stats:page:about
+incrby ratings:video:12333 5
+incrby ratings:video:12333 3
+hset users:goku powerlevel 9000
+hget users:goku powerlevel
+hmset users:goku race saiyan age 737
+hmget users:goku race powerlevel
+hgetall users:goku
+hkeys users:goku
+hdel users:goku age
+rpush newusers goku
+ltrim newusers 0 50
+sadd friends:leto ghanima paul chani jessica
+sadd friends:duncan paul jessica alia
+sismember friend:leto jessica
+sismember friend:leto vladimir
+sinter friends:leto friends:duncan
+sinterstore friends:leto_duncan friends:leto friends:duncan
+del friends:leto
+zadd friends:leto 100 ghanima 95 paul 95 chani 75 jessica 1 vladimir
+zcount friends:leto 90 100
+zrevrank friends:leto chani
+keys *
+del users:leto stats:page:about ratings:video:12333 users:goku newusers
+del friends:leto friends:duncan friends:leto_duncan friends:leto

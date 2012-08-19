@@ -1,0 +1,50 @@
+body, input, table, td, textarea, th {
+    color: #222;
+    font-family: "Droid Mono", "Menlo", monospace;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+hr {
+    border-bottom: 1px solid #eee;
+    border-top: 1px solid #666;
+    margin: 2em 0;
+}
+
+#server-info table,
+#server-test fieldset {
+    border: 2px solid #999;
+    padding: 4px 8px;
+    width: 100%;
+}
+
+#server-info th {
+    font-size: 16px;
+    padding-top: 8px;
+    text-align: left;
+}
+
+#server-test input[type="submit"] {
+    border: 1px solid #ccc;
+    background-color: #eee;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 12px;
+}
+
+#server-test input[type="submit"]:hover {
+    text-decoration: underline;
+}
+
+#server-test label {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.github-ribbon img {
+    border: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}

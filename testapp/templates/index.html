@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block content %}
+  <article id="server-info">
+    <h2 title="redis.info()">Redis information</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2">Server</th>
+          <th colspan="2">Clients</th>
+          <th colspan="2">Memory</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td title="redis_version">Version</td>
+          <td>{{ info.redis_version }}</td>
+          <td title="connected_clients">Connected</td>
+          <td>{{ info.connected_clients }}</td>
+          <td title="used_memory_human">Used</td>
+          <td>{{ info.used_memory_human }}</td>
+        </tr>
+
+        <tr>
+          <td title="arch_bits">Architercture</td>
+          <td>{{ info.arch_bits }}</td>
+          <td title="blocked_clients">Blocked</td>
+          <td>{{ info.blocked_clients }}</td>
+          <td title="used_memory_peak_human">Peak</td>
+          <td>{{ info.used_memory_peak_human }}</td>
+        </tr>
+
+        <tr>
+          <td title="uptime_in_seconds">Uptime</td>
+          <td>{{ info.uptime_in_seconds }}</td>
+          <td colspan="2">&nbsp;</td>
+          <td title="mem_fragmentation_ratio">Ratio</td>
+          <td>{{ info.mem_fragmentation_ratio }}</td>
+        </tr>
+
+        <tr>
+          <td class="multiplexing_api">Multiplexing API</td>
+          <td>{{ info.multiplexing_api }}</td>
+          <td colspan="2">&nbsp;</td>
+          <td title="mem_allocator">Memory allocator</td>
+          <td>{{ info.mem_allocator }}</td>
+        </tr>
+      </tbody>
+
+      <thead>
+        <tr>
+          <th colspan="2">Stats</th>
+          <th colspan="2">CPU</th>
+          <th colspan="2">Other</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td title="total_connections_received">Total connections</td>
+          <td>{{ info.total_connections_received }}</td>
+          <td title="used_cpu_sys">System</td>
+          <td>{{ info.used_cpu_sys }}</td>
+          <td title="role">Replication</td>
+          <td>{{ info.role }}</td>
+        </tr>
+
+        <tr>
+          <td title="total_commands_processed">Total commands</td>
+          <td>{{ info.total_commands_processed }}</td>
+          <td title="used_cpu_user">User</td>
+          <td>{{ info.used_cpu_user }}</td>
+          <td title="cluster_enabled">Cluster enabled</td>
+          <td>{{ info.cluster_enabled|default(0) }}</td>
+        </tr>
+
+        <tr>
+          <td title="expired_keys / evicted_keys">Expired / evicted keys</td>
+          <td>{{ info.expired_keys }} / {{ info.evicted_keys }}</td>
+          <td title="used_cpu_sys_children">System (background)</td>
+          <td>{{ info.used_cpu_sys_children }}</td>
+          <td title="loading">Loading</td>
+          <td>{{ info.loading }}</td>
+        </tr>
+
+        <tr>
+          <td title="keyspace_hits / keyspace_misses">Keyspace hits / misses</td>
+          <td>{{ info.keyspace_hits }} / {{ info.keyspace_misses }}</td>
+          <td title="used_cpu_user_children">User (background)</td>
+          <td>{{ info.used_cpu_user_children }}</td>
+          <td title="aof_enabled">AOF enabled</td>
+          <td>{{ info.aof_enabled }}</td>
+        </tr>
+
+        <tr>
+          <td title="pubsub_channels / pubsub_patterns">Pub/sub channels / patterns</td>
+          <td>{{ info.pubsub_channels }} / {{ info.pubsub_patterns }}</td>
+          <td colspan="2">&nbsp;</td>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+      </tbody>
+    </table>
+  </article>
+
+  <hr>
+
+  <article id="server-test">
+    <h2>Test Redis server</h2>
+
+    <form action="{{ url_for("test") }}" method="post">
+      <fieldset>
+        <p>
+          <label for="id_scenario_type">Scenario type</label><br>
+          <select id="id_scenario_type" name="scenario_type">
+            <option value="redis">Redis</option>
+            <option selected="selected" value="python">Python</option>
+          </select>
+        </p>
+
+        <p>
+          <label for="id_scenario">Scenario</label><br>
+          <textarea id="id_scenario" name="scenario" cols="100" rows="10"></textarea><br>
+          <a id="fill-scenario" href="#fill-scenario">Fill with predefined scenario</a>
+        </p>
+
+        <p>
+          <input type="submit" value="Run!">
+        </p>
+      </fieldset>
+    </form>
+
+    <script type="text/javascript"><!--
+      var scenario = document.getElementById("id_scenario");
+      var scenarioType = document.getElementById("id_scenario_type");
+      var link = document.getElementById("fill-scenario");
+
+      link.onclick = function() {
+        if (scenarioType.value == "python") {
+          scenario.value = {{ scenario_python|tojson|safe }};
+        }
+        else {
+          scenario.value = {{ scenario_redis|tojson|safe }};
+        }
+        return false;
+      };
+    --></script>
+  </article>
+{% endblock %}
