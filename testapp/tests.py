@@ -10,9 +10,14 @@ if not hasattr(unittest.TestCase, 'assertIn'):
 from flask import url_for
 from flask.ext.redis import Redis
 from redis.exceptions import ConnectionError
+from sandbox import Sandbox
+from sandbox.recursion import SetRecursionLimit
 
 from app import app, redis
 from scenarios.default import SCENARIO
+
+
+Sandbox.PROTECTIONS.remove(SetRecursionLimit)
 
 
 class TestCase(unittest.TestCase):
@@ -138,7 +143,7 @@ class TestViews(TestCase):
         self.assertIn('True', response.data)
         self.assertIn('&gt; redis.info()', response.data)
 
-    def test_default(self):
+    def test_test_default(self):
         data = {'scenario': SCENARIO, 'scenario_type': 'redis'}
         response = self.app.post(self.test_url, data=data)
         self.assertIn('<h2>Scenario successfully executed</h2>', response.data)
