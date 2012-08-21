@@ -15,6 +15,9 @@ hr {
 #server-test fieldset {
     border: 2px solid #999;
     padding: 4px 8px;
+}
+
+#server-info table {
     width: 100%;
 }
 
