@@ -148,6 +148,12 @@ the project's `GitHub issues
 Changelog
 =========
 
+0.3.3
+-----
+
++ Fix problem while parsing ``REDIS_URL`` value, strip unnecessary slashes from
+  database path (like ``redis://localhost:6379/12/``).
+
 0.3.2
 -----
 

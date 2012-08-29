@@ -14,7 +14,7 @@ readme.close()
 
 setup(
     name='Flask-And-Redis',
-    version='0.3.2',
+    version='0.3.3',
     description='Simple as dead support of Redis database for Flask apps.',
     long_description=README,
     author='Igor Davydenko',
