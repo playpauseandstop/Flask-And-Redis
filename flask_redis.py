@@ -83,8 +83,8 @@ class Redis(BaseRedis):
             app.config['REDIS_PORT'] = url.port
             app.config['REDIS_USER'] = url.username
             app.config['REDIS_PASSWORD'] = url.password
-            app.config['REDIS_DB'] = \
-                url.path if url.path.isdigit() else None
+            db = url.path.replace('/', '')
+            app.config['REDIS_DB'] = db if db.isdigit() else None
 
         spec = inspect.getargspec(BaseRedis.__init__)
         args = set(spec.args).difference(set(['self']))
