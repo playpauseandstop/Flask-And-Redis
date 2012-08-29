@@ -95,12 +95,25 @@ class TestFlaskRedis(TestCase):
         obj = Redis(app)
         obj.ping()
 
+        app.config['REDIS_URL'] = 'redis://%s:%d/%d/' % (host, port, db)
+
+        obj = Redis(app)
+        obj.ping()
+
     def test_default_behaviour_url_init_app(self):
         host = app.config.pop('REDIS_HOST')
         port = app.config.pop('REDIS_PORT')
         db = app.config.pop('REDIS_DB')
 
         app.config['REDIS_URL'] = 'redis://%s:%d/%d' % (host, port, db)
+
+        obj = Redis()
+        self.assertRaises(AttributeError, obj.ping)
+
+        obj.init_app(app)
+        obj.ping()
+
+        app.config['REDIS_URL'] = 'redis://%s:%d/%d/' % (host, port, db)
 
         obj = Redis()
         self.assertRaises(AttributeError, obj.ping)
