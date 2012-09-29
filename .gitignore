@@ -1,9 +1,18 @@
 *.pyc
 *.pyo
 
+.coverage
+
 build/
 dist/
 testapp/env/
 testapp/env-2.4/
+testapp/redis/backup/
+testapp/redis/slave/
+testapp/redis/backup.pid
+testapp/redis/backup.log
+testapp/redis/slave.pid
+testapp/redis/slave.log
+testapp/settings_local.py
 
 MANIFEST
