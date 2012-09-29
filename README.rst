@@ -31,8 +31,8 @@ License
 Configuration
 =============
 
-As of ``py-redis`` 2.4.11 release you should setup next options in your
-settings module:
+As of ``py-redis`` 2.4.11 and 2.6.0 releases you should setup next options in
+your settings module:
 
 * ``REDIS_HOST``
 * ``REDIS_PORT``
@@ -44,99 +44,47 @@ settings module:
 * ``REDIS_ERRORS``
 * ``REDIS_UNIX_SOCKET_PATH``
 
-Then all of these args would be sent to ``redis.Redis.__init__`` method.
+REDIS_URL
+---------
 
-You also could pass app into initialized instance afterwards with ``init_app``
-method::
+.. versionadded:: 0.2
 
-    from flask import Flask
-    from flask.ext.redis import Redis
+Some times, your redis settings stored as ``redis://...`` url (like in Heroku
+or DotCloud services), so you could to provide just ``REDIS_URL`` setting
+and ``Flask-And-Redis`` auto parsed that value and will configure then valid
+redis connection.
 
+Config prefix
+-------------
 
-    app = Flask(__name__)
-
-    redis = Redis()
-    redis.init_app(app)
-
-.. warning:: Please note, if you'll initialize extension that way, make sure
-   that before ``init_app`` call all real Redis method's would be return
-   ``AttributeError`` exception cause of no ``connection_pool`` attribute,
-   which setup on ``redis.Redis`` instance init.
-
-Advanced
---------
-
-Some times, your redis setting stored as ``redis://...`` url (like in Heroku
-or DotCloud services), sou you could to provide just ``REDIS_URL`` value
-and ``Flask-And-Redis`` auto parsed that url and configured then valid redis
-connection.
+.. versionadded:: 0.4
 
 Usage
 =====
 
-Basic
------
-
-::
+In regular case all of you need is import ``Redis`` instance and initialize it
+with ``app`` instance, like::
 
     from flask import Flask
     from flask.ext.redis import Redis
 
-
     app = Flask(__name__)
     redis = Redis(app)
 
-Test application
-----------------
+If you use application factories you could use ``init_app`` method,
 
-``testapp/app.py``
-
-::
-
-    from flask import Flask, redirect, url_for
-    from flask.ext.redis import Redis
-
-    from testapp import settings
-
-
-    # Initialize simple Flask application
-    app = Flask(__name__)
-    app.config.from_object(settings)
-
-    # Setup Redis conection
-    redis = Redis(app)
-
-    # Add two simple views: One for forgetting counter
-    @app.route('/forget-us')
-    def forget_us():
-        key = app.config['COUNTER_KEY']
-        redis.delete(key)
-        return redirect(url_for('home'))
-
-
-    # Second for remembering visiting counter
-    @app.route('/')
-    def home():
-        key = app.config['COUNTER_KEY']
-        counter = redis.incr(key)
-        message = 'Hello, visitor!'
-
-        if counter != 1:
-            message += "\nThis page viewed %d time(s)." % counter
-
-        return message
-
-----
-
-``testapp/settings.py``
+.. versionadded:: 0.3
 
 ::
 
-    COUNTER_KEY = 'testapp:counter'
-    REDIS_HOST = 'localhost'
-    REDIS_PORT = 6379
-    REDIS_DB = 0
-    # REDIS_URL = 'redis://localhost:6379/0'
+    redis = Redis()
+    # The later on
+    app = create_app('config.cfg')
+    redis.init_app(app)
+
+Also later you can get ``redis`` connection from ``app.extensions['redis']``
+dict, where ``key`` is config prefix and ``value`` is worked redis connection
+instance.
 
 Bugs, feature requests?
 =======================
@@ -147,6 +95,16 @@ the project's `GitHub issues
 
 Changelog
 =========
+
+0.4
+---
+
++ Big refactor of ``Redis`` instance. Do not inherit ``redis.Redis`` class,
+  store active redis connection in ``Redis.connection`` attribute and
+  ``app.extensions['redis']`` dict.
++ Add support of ``config_prefix`` keyword argument for ``Redis`` or
+  ``init_app`` methods.
++ Support multiple redis connections in test application.
 
 0.3.3
 -----
