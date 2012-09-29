@@ -1,7 +1,18 @@
-COUNTER_KEY = 'testapp:counter'
+# Redis settings
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
+
+REDIS_BACKUP_HOST = 'localhost'
+REDIS_BACKUP_PORT = 6380
+REDIS_BACKUP_DB = 0
+
+REDIS_SLAVE_HOST = 'localhost'
+REDIS_SLAVE_PORT = 6381
+REDIS_SLAVE_DB = 0
+
+# Enable multiple redis servers, by default not
+MULTIPLE_REDIS_SERVERS = False
 
 
 try:

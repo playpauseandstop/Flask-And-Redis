@@ -8,6 +8,7 @@
     Cannot convert redis scenario to Python, error is: {{ exception }}.
   {% elif error == "exception" %}
     Error while executing Python scenario, error is: {{ exception }}.
+    <pre><code>{{ traceback }}</code></pre>
   {% endif %}</p>
   {% else %}
   <h2>Scenario successfully executed</h2>
@@ -23,5 +24,5 @@
   <p>Execution time: {{ results.time }} ms.</p>
   {% endif %}
   <hr>
-  <p>&laquo; <a href="{{ url_for("home") }}">Back to index page</a></p>
+  <p>&laquo; <a href="{{ url_for("home") }}?server={{ server }}">Back to index page</a></p>
 {% endblock %}

@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
   <article id="server-info">
+    {% if config.MULTIPLE_REDIS_SERVERS %}
+    <h2>
+      Current server: '{{ server }}'.
+      Choose server:
+      <a href="?server=">default</a> &middot;
+      <a href="?server=backup">backup</a> &middot;
+      <a href="?server=slave">slave</a>
+    </h2>
+    {% endif %}
     <h2 title="redis.info()">Redis information</h2>
 
     <table>
@@ -125,6 +134,7 @@
         </p>
 
         <p>
+          <input type="hidden" name="server" value="{{ server }}">
           <input type="submit" value="Run!">
         </p>
       </fieldset>

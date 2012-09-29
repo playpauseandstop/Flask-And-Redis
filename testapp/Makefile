@@ -1,31 +1,53 @@
-.PHONY: bootstrap clean distclean server shell test
+.PHONY: bootstrap clean distclean killredis manage redis server shell test
 
 # Project and environment settings
-env = env
-env24 = $(env)-2.4
-project = .
-python = PYTHONPATH=.. $(env)/bin/python
-python24 = PYTHONPATH=.. $(env24)/bin/python
+ENV = env
+ENV24 = $(ENV)-2.4
+PROJECT = .
+
+# Python settings
+PYTHON = PYTHONPATH=.. $(ENV)/bin/python
+PYTHON24 = PYTHONPATH=.. $(ENV24)/bin/python
+
+MANAGE = $(PYTHON) $(PROJECT)/manage.py
+MANAGE24 = $(PYTHON) $(PROJECT)/manage.py
 
 # Server settings
-IP ?= 0.0.0.0
+HOST ?= 0.0.0.0
 PORT ?= 4353
 
+# Test settings
+TEST_ARGS ?= -vf
+
 bootstrap:
-	bootstrap.py --copy-virtualenv
+	bootstrapper
 
 clean:
 	find . -name '*.pyc' -delete
 
 distclean: clean
-	rm -rf build dist $(env) $(env24)
+	rm -rf ../build ../dist $(ENV) $(ENV24)
+
+killredis:
+	-kill `ps -o "pid,command" | grep "redis-server redis/backup.conf" | grep -v grep | awk '{print $$1}'`
+	-kill `ps -o "pid,command" | grep "redis-server redis/slave.conf" | grep -v grep | awk '{print $$1}'`
+
+manage:
+	$(MANAGE) $(COMMAND)
+
+redis:
+	[ ! -d redis/backup/ ] && mkdir redis/backup/ || :
+	redis-server redis/backup.conf > redis/backup.log &
+
+	[ ! -d redis/slave/ ] && mkdir redis/slave/ || :
+	redis-server redis/slave.conf > redis/slave.log &
 
 server:
-	$(python) $(project)/app.py $(IP):$(PORT)
+	$(MANAGE) runserver -t $(HOST) -p $(PORT)
 
 shell:
-	PYTHONPATH=.:.. $(env)/bin/ipython --color-info --no-banner --pprint
+	$(MANAGE) shell
 
 test:
-	$(python) $(project)/tests.py
-	$(python24) $(project)/tests.py
+	PYTHONPATH=.:.. $(ENV)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
+	PYTHONPATH=.:.. $(ENV24)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/

@@ -1,4 +1,6 @@
+coverage==3.5.2
 Flask==0.9
+Flask-Script==0.4.0
 pysandbox==1.5
 redis==2.4.13
 unittest2==0.5.1
