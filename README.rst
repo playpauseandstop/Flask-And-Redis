@@ -44,6 +44,13 @@ your settings module:
 * ``REDIS_ERRORS``
 * ``REDIS_UNIX_SOCKET_PATH``
 
+Later these values would initialize ``redis.Redis`` connection and all public
+methods of that instance would be added to ``flask_redis.Redis`` instance for
+easy use.
+
+Also this connection would be stored in ``flask_redis.Redis.connection``
+attribute and in ``app.extensions['redis']`` dict.
+
 REDIS_URL
 ---------
 
@@ -54,10 +61,31 @@ or DotCloud services), so you could to provide just ``REDIS_URL`` setting
 and ``Flask-And-Redis`` auto parsed that value and will configure then valid
 redis connection.
 
+In case, when ``REDIS_URL`` provided all appropriate configurations, and other
+keys are overwritten using their values at the present URI.
+
 Config prefix
 -------------
 
 .. versionadded:: 0.4
+
+Config prefix allows you to determine the set of configuration variables used
+to configure ``redis.Redis`` connection. By default, config prefix ``REDIS``
+would be used.
+
+So when you want to initialize several ``redis`` connections, you need to::
+
+    from flask import flask
+    from flask.ext.redis import Redis
+
+    app = Flask(__app__)
+    app.config['REDIS_HOST'] = 'localhost'
+    app.config['REDIS_PORT'] = 6379
+    app.config['REDIS_DB'] = 0
+    redis1 = Redis(app)
+
+    app.config['REDIS2_URL'] = 'redis://localhost:6379/1'
+    redis2 = Redis(app, 'REDIS2')
 
 Usage
 =====
