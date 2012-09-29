@@ -8,7 +8,7 @@
     Cannot convert redis scenario to Python, error is: {{ exception }}.
   {% elif error == "exception" %}
     Error while executing Python scenario, error is: {{ exception }}.
-    <pre><code>{{ traceback }}</code></pre>
+    {% if config.SHOW_TRACEBACK %}<pre><code>{{ traceback }}</code></pre>{% endif %}
   {% endif %}</p>
   {% else %}
   <h2>Scenario successfully executed</h2>

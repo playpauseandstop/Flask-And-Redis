@@ -11,8 +11,9 @@ REDIS_SLAVE_HOST = 'localhost'
 REDIS_SLAVE_PORT = 6381
 REDIS_SLAVE_DB = 0
 
-# Enable multiple redis servers, by default not
+# Enable multiple redis servers and showing traceback on errors, by default not
 MULTIPLE_REDIS_SERVERS = False
+SHOW_TRACEBACK = False
 
 
 try:
