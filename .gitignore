@@ -7,6 +7,7 @@ build/
 dist/
 testapp/env/
 testapp/env-2.4/
+testapp/env-2.6/
 testapp/redis/backup/
 testapp/redis/slave/
 testapp/redis/backup.pid

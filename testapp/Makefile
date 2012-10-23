@@ -3,14 +3,17 @@
 # Project and environment settings
 ENV = env
 ENV24 = $(ENV)-2.4
+ENV26 = $(ENV)-2.6
 PROJECT = .
 
 # Python settings
 PYTHON = PYTHONPATH=.. $(ENV)/bin/python
 PYTHON24 = PYTHONPATH=.. $(ENV24)/bin/python
+PYTHON26 = PYTHONPATH=.. $(ENV26)/bin/python
 
 MANAGE = $(PYTHON) $(PROJECT)/manage.py
 MANAGE24 = $(PYTHON) $(PROJECT)/manage.py
+MANAGE26 = $(PYTHON) $(PROJECT)/manage.py
 
 # Server settings
 HOST ?= 0.0.0.0
@@ -51,3 +54,4 @@ shell:
 test:
 	PYTHONPATH=.:.. $(ENV)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
 	PYTHONPATH=.:.. $(ENV24)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
+	PYTHONPATH=.:.. $(ENV26)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
