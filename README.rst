@@ -2,6 +2,8 @@
 Flask-And-Redis
 ===============
 
+.. image:: https://secure.travis-ci.org/playpauseandstop/Flask-And-Redis.png
+
 Simple as dead support of Redis database for Flask apps.
 
 .. note:: I named this ``Flask-And-Redis``, cause ``Flask-Redis`` name already
