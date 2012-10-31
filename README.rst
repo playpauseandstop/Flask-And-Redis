@@ -11,7 +11,7 @@ Simple as dead support of Redis database for Flask apps.
 Requirements
 ============
 
-* `Python <http://www.python.org>`_ 2.6 or higher
+* `Python <http://www.python.org>`_ 2.6 or 2.7
 * `Flask <http://flask.pocoo.org/>`_ 0.8 or higher
 * `redis-py <https://github.com/andymccurdy/redis-py>`_ 2.4 or higher
 
