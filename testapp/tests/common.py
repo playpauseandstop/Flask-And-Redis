@@ -1,7 +1,9 @@
+from unittest2 import TestCase as UnitTestCase
+
 from flask.ext.testing import TestCase as BaseTestCase
 
 
-class TestCase(BaseTestCase):
+class TestCase(BaseTestCase, UnitTestCase):
 
     TESTING = True
 
