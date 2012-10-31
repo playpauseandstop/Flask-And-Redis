@@ -1,5 +1,5 @@
 language: python
-services: redis
+services: redis-server
 python:
  - "2.6"
  - "2.7"
