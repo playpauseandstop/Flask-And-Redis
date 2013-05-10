@@ -41,7 +41,7 @@ all you need is putting
 * ``REDIS_PORT``
 * ``REDIS_DB``
 
-to your settings module. Other available settings are::
+to your settings module. Other available settings are:
 
 * ``REDIS_PASSWORD``
 * ``REDIS_SOCKET_TIMEOUT``
