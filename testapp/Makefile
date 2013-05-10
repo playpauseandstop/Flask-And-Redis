@@ -1,7 +1,7 @@
 .PHONY: bootstrap clean distclean killredis manage redis server shell test
 
 # Project and environment settings
-ENV = env
+ENV ?= env
 ENV24 = $(ENV)-2.4
 ENV26 = $(ENV)-2.6
 PROJECT = .
