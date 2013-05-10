@@ -1,7 +1,7 @@
-coverage==3.5.2
 Flask==0.9
 Flask-Script==0.4.0
 Flask-Testing==0.4
+coverage==3.6
 pysandbox==1.5
-redis==2.7.1
+redis==2.7.4
 unittest2==0.5.1
