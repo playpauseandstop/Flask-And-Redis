@@ -33,32 +33,58 @@ License
 Configuration
 =============
 
-As of ``py-redis`` 2.4.11 and 2.6.0 releases you should setup next options in
-your settings module:
+``Flask-And-Redis`` understands all keyword arguments which should be passed
+to ``redis.StrictRedis`` or ``redis.Redis`` classes init method. In easiest way
+all you need is putting
 
 * ``REDIS_HOST``
 * ``REDIS_PORT``
 * ``REDIS_DB``
+
+to your settings module. Other available settings are::
+
 * ``REDIS_PASSWORD``
 * ``REDIS_SOCKET_TIMEOUT``
 * ``REDIS_CONNECTION_POOL``
 * ``REDIS_CHARSET``
 * ``REDIS_ERRORS``
+* ``REDIS_DECODE_RESPONSES``
 * ``REDIS_UNIX_SOCKET_PATH``
 
-Later these values would initialize ``redis.Redis`` connection and all public
-methods of that instance would be added to ``flask_redis.Redis`` instance for
-easy use.
+Later these values would initialize redis connection and all public methods of
+connection's instance would be copied to ``flask_redis.Redis``. Also connection
+would be stored in ``flask_redis.Redis.connection`` attribute and in
+``app.extensions['redis']`` dict.
 
-Also this connection would be stored in ``flask_redis.Redis.connection``
-attribute and in ``app.extensions['redis']`` dict.
+But that's not all, extension also have two more configuration options and
+ability to connect to multiple redis instances.
+
+REDIS_CLASS
+-----------
+
+.. versionadded:: 0.5
+
+Before 0.5 version only ``redis.Redis`` connection used. But as times change
+and ``redis.StrictRedis`` class grab default status we start to using it as
+our default connection class.
+
+To change this behavior or even use your own class for redis connection you
+should pass a class itself or its path to ``REDIS_CLASS`` setting as::
+
+  from redis import Redis
+  REDIS_CLASS = Redis
+
+or::
+
+  REDIS_CLASS = 'redis.Redis'
+  REDIS_CLASS = 'path.to.module.Redis'
 
 REDIS_URL
 ---------
 
 .. versionadded:: 0.2
 
-Some times, your redis settings stored as ``redis://...`` url (like in Heroku
+Sometimes, your redis settings stored as ``redis://...`` url (like in Heroku
 or DotCloud services), so you could to provide just ``REDIS_URL`` setting
 and ``Flask-And-Redis`` auto parsed that value and will configure then valid
 redis connection.
@@ -75,7 +101,8 @@ Config prefix allows you to determine the set of configuration variables used
 to configure ``redis.Redis`` connection. By default, config prefix ``REDIS``
 would be used.
 
-So when you want to initialize several ``redis`` connections, you need to::
+But when you want to initialize multiple redis connections, you could do this
+like::
 
     from flask import flask
     from flask.ext.redis import Redis
@@ -92,8 +119,8 @@ So when you want to initialize several ``redis`` connections, you need to::
 Usage
 =====
 
-In regular case all of you need is import ``Redis`` instance and initialize it
-with ``app`` instance, like::
+In regular case all you need is importing ``flask_redis.Redis`` instance and
+initialize it with ``app`` instance, like::
 
     from flask import Flask
     from flask.ext.redis import Redis
@@ -101,9 +128,9 @@ with ``app`` instance, like::
     app = Flask(__name__)
     redis = Redis(app)
 
-If you use application factories you could use ``init_app`` method,
-
 .. versionadded:: 0.3
+
+But if you use application factories you could use ``init_app`` method,
 
 ::
 
@@ -125,6 +152,13 @@ the project's `GitHub issues
 
 Changelog
 =========
+
+0.5
+---
+
++ Use ``redis.StrictRedis`` class to connection by default.
++ Understands unix socket path in ``REDIS_HOST``.
++ Updates to README.
 
 0.4
 ---

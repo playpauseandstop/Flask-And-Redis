@@ -5,16 +5,17 @@ import os
 from distutils.core import setup
 
 
-DIRNAME = os.path.dirname(__file__)
+DIRNAME = os.path.abspath(os.path.dirname(__file__))
+rel = lambda *parts: os.path.abspath(os.path.join(DIRNAME, *parts))
 
-readme = open(os.path.join(DIRNAME, 'README.rst'), 'r')
-README = readme.read()
-readme.close()
+README = open(rel('README.rst')).read()
+INIT_PY = open(rel('flask_redis.py')).read()
+VERSION = re.findall("__version__ = '([^']+)'", INIT_PY)[0]
 
 
 setup(
     name='Flask-And-Redis',
-    version='0.4',
+    version=VERSION,
     description='Simple as dead support of Redis database for Flask apps.',
     long_description=README,
     author='Igor Davydenko',
