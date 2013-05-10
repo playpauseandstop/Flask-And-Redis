@@ -76,11 +76,18 @@ class Redis(object):
 
             # URL could contains host, port, user, password and db values
             app.config[key('HOST')] = url.hostname
-            app.config[key('PORT')] = url.port
+            app.config[key('PORT')] = url.port or 6379
             app.config[key('USER')] = url.username
             app.config[key('PASSWORD')] = url.password
             db = url.path.replace('/', '')
             app.config[key('DB')] = db if db.isdigit() else None
+
+        # If host startswith file:// or / use it as unix socket path
+        host = app.config[key('HOST')]
+
+        if host.startswith('file://') or host.startswith('/'):
+            app.config.pop(key('HOST'))
+            app.config[key('UNIX_SOCKET_PATH')] = host
 
         # Read connection args spec, exclude self from list of possible
         args = inspect.getargspec(klass.__init__).args
