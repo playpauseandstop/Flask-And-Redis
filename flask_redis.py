@@ -1,92 +1,80 @@
 import inspect
 import urlparse
 
-from redis import Redis as BaseRedis
+from redis import StrictRedis
+from werkzeug.utils import import_string
 
 
 __all__ = ('Redis', )
 
 
+__version__ = '0.5'
+
+
 class Redis(object):
     """
-    Simple object to initialize redis client using settings from Flask
-    application.
+    Simple as dead support of Redis database for Flask apps.
     """
     def __init__(self, app=None, config_prefix=None):
         """
-        Overwrite default ``Redis.__init__`` method, read all necessary
-        settings from Flask app config instead of positional and keyword args.
+        If app argument provided then initialize redis connection using
+        application config values.
 
-        The possible settings are:
+        If no app argument provided you should do initialization later with
+        :meth:`init_app` method.
 
-        * REDIS_HOST
-        * REDIS_PORT
-        * REDIS_DB
-        * REDIS_PASSWORD
-        * REDIS_SOCKET_TIMEOUT
-        * REDIS_CONNECTION_POOL
-        * REDIS_CHARSET
-        * REDIS_ERRORS
-        * REDIS_UNIX_SOCKET_PATH
-
-        You also could initialize ``Redis`` instance without sending ``app``
-        object, but do this after with ``init_app`` method, like::
-
-            from flask import Flask
-            from flask.ext.redis import Redis
-
-            app = Flask(__name__)
-
-            redis = Redis()
-            redis.init_app(app)
-
-        .. warning:: Please note, if you'll initialize extension that way, make
-           sure that before ``init_app`` call all real Redis method's would be
-           return ``AttributeError`` exception cause of no ``connection_pool``
-           attribute, which setup on ``Redis`` instance init.
-
-        Advanced usage
-        --------------
-
-        If you want to use this extension on Heroku or other build services
-        where redis URL stored in environment var you could to determine full
-        URL to redis server.
-
-        For example, for Heroku apps which used ``REDISTOGO_URL`` environ app,
-        you'll need to update your project settings with::
-
-            import os
-
-            REDIS_URL = 'redis://localhost:6379/0'
-            REDIS_URL = os.environ.get('REDISTOGO_URL', REDIS_URL)
-
+        :param app: Flask application instance.
+        :param config_prefix: Config prefix to use.
         """
         if app is not None:
             self.init_app(app, config_prefix)
 
     def init_app(self, app, config_prefix=None):
         """
-        Actual method to read redis settings from app configuration.
+        Actual method to read redis settings from app configuration,
+        initialize redis connection and copy all public connection methods to
+        current instance.
+
+        :param app: Flask application instance.
+        :param config_prefix: Config prefix to use. By default: 'REDIS'
         """
+        # Put redis to application extensions
         if not 'redis' in app.extensions:
             app.extensions['redis'] = {}
 
+        # Which config prefix to use, custom or default one?
         self.config_prefix = config_prefix = config_prefix or 'REDIS'
 
+        # No way to do registration two times
         if config_prefix in app.extensions['redis']:
             raise ValueError('Already registered config prefix {0!r}.'.
                              format(config_prefix))
 
+        # Start reading configuration, define converters to use and key func
+        # to prepend config prefix to key value
         converters = {'port': int}
-        key = lambda suffix: u'{0}_{1}'.format(config_prefix, suffix)
+        convert = lambda arg, value: (converters[arg](value)
+                                      if arg in converters
+                                      else value)
+        key = lambda suffix: '{0}_{1}'.format(config_prefix, suffix)
+
+        # Which redis connection class to use?
+        klass = app.config.get(key('CLASS'), StrictRedis)
+
+        # Import connection class if it stil path notation
+        if isinstance(klass, basestring):
+            klass = import_string(klass)
+
+        # Should we use URL configuration
         url = app.config.get(key('URL'))
 
+        # If should, parse URL and store values to application config to later
+        # reuse if necessary
         if url:
             urlparse.uses_netloc.append('redis')
             url = urlparse.urlparse(url)
 
-            # URL could contains host, port, user, password and db
-            # values. Store their to config
+            # URL could contains host, port, user, password and db values
             app.config[key('HOST')] = url.hostname
             app.config[key('PORT')] = url.port
             app.config[key('USER')] = url.username
@@ -94,34 +82,28 @@ class Redis(object):
             db = url.path.replace('/', '')
             app.config[key('DB')] = db if db.isdigit() else None
 
-        spec = inspect.getargspec(BaseRedis.__init__)
-        args = set(spec.args).difference(set(['self']))
-        kwargs = {}
+        # Read connection args spec, exclude self from list of possible
+        args = inspect.getargspec(klass.__init__).args
+        args.remove('self')
 
-        for arg in args:
-            redis_arg = key(arg.upper())
+        # Prepare keyword arguments
+        kwargs = dict([(arg, convert(arg, app.config[key(arg.upper())]))
+                       for arg in args
+                       if key(arg.upper()) in app.config])
 
-            if not redis_arg in app.config:
-                continue
+        # Initialize connection and store it to extensions
+        self.connection = connection = klass(**kwargs)
+        app.extensions['redis'][config_prefix] = connection
 
-            value = app.config.get(redis_arg)
+        # Include public methods to current instance
+        self._include_public_methods(connection)
 
-            if arg in converters:
-                value = converters[arg](value)
-
-            kwargs.update({arg: value})
-
-        self.connection = redis = BaseRedis(**kwargs)
-        app.extensions['redis'][config_prefix] = redis
-
-        self._include_redis_methods(redis)
-
-    def _include_redis_methods(self, redis):
+    def _include_public_methods(self, connection):
         """
-        Include redis methods as current instance methods.
+        Include public methods from connection instance to current instance.
         """
-        for attr in dir(redis):
-            value = getattr(redis, attr)
+        for attr in dir(connection):
+            value = getattr(connection, attr)
             if attr.startswith('_') or not callable(value):
                 continue
             self.__dict__[attr] = value
