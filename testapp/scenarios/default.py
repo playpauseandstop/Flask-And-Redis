@@ -2,6 +2,7 @@ import os
 
 from decimal import ROUND_UP, Decimal
 
+import flask_redis
 import redis
 
 
@@ -9,6 +10,7 @@ __all__ = ('SCENARIO', 'convert_scenario')
 
 
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
+IS_24 = redis.__version__.startswith('2.4')
 SCENARIO = open(os.path.join(DIRNAME, 'scenario.redis'), 'rb').read()
 
 
@@ -46,9 +48,12 @@ def convert_scenario(scenario):
     }
     result = []
 
-    if redis.__version__.startswith('2.4'):
+    if IS_24:
         convert_args.update({'getrange': lambda args: ['getrange'] + args})
         convert_cmds.update({'getrange': 'execute_command'})
+
+    if hasattr(flask_redis, '__version__') and not IS_24:
+        convert_args.pop('zadd')
 
     for line in scenario.splitlines():
         arg, args, ignore_whitespace = '', [], False

@@ -1,4 +1,11 @@
+import redis
+
+# Check redis version
+IS_24 = redis.__version__.startswith('2.4')
+
+
 # Redis settings
+REDIS_CLASS = 'redis.Redis' if IS_24 else 'redis.StrictRedis'
 REDIS_HOST = 'localhost'
 REDIS_PORT = 6379
 REDIS_DB = 0
