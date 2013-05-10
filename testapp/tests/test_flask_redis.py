@@ -1,9 +1,16 @@
 from flask.ext.redis import Redis
+from redis import StrictRedis
 from redis.exceptions import ConnectionError
 
 from app import redis as default_redis
 
 from .common import TestCase
+
+
+class CustomRedis(StrictRedis):
+    """
+    Custom Redis class based on ``StrictRedis``.
+    """
 
 
 class TestFlaskRedis(TestCase):
@@ -70,6 +77,17 @@ class TestFlaskRedis(TestCase):
         redis.init_app(self.app, 'REDIS3')
         self.assertRaises(ConnectionError, redis.ping)
 
+    def test_connection_class(self):
+        self.app.config['REDIS_CUSTOM_CLASS'] = CustomRedis
+        self.app.config['REDIS_CUSTOM_URL'] = 'redis://localhost:6379/0'
+        redis = Redis(self.app, 'REDIS_CUSTOM')
+        redis.ping()
+
+        self.app.extensions['redis'].pop('REDIS_CUSTOM')
+        self.app.config['REDIS_CUSTOM_CLASS'] = 'redis.Redis'
+        redis = Redis(self.app, 'REDIS_CUSTOM')
+        redis.ping()
+
     def test_default_behaviour(self):
         self.assertEqual(default_redis.config_prefix, 'REDIS')
         default_redis.ping()
@@ -128,9 +146,20 @@ class TestFlaskRedis(TestCase):
                 continue
             self.assertIn(attr, attributes)
 
+    def test_unix_socket_path(self):
+        self.app.config['REDIS_CUSTOM_HOST'] = '/does/not/exist/redis.sock'
+        redis = Redis(self.app, 'REDIS_CUSTOM')
+        self.assertRaisesRegexp(ConnectionError, 'unix socket', redis.ping)
+
     def test_url(self):
         self.app.extensions.pop('redis')
         self.app.config['REDIS_URL'] = 'redis://localhost:6379/0'
+        redis = Redis(self.app)
+        redis.ping()
+
+    def test_url_default_port(self):
+        self.app.extensions.pop('redis')
+        self.app.config['REDIS_URL'] = 'redis://localhost/0'
         redis = Redis(self.app)
         redis.ping()
 
