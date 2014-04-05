@@ -1,13 +1,13 @@
-.PHONY: bootstrap clean distclean killredis manage pep8 redis server shell test
+.PHONY: bootstrap clean distclean killredis listupdates manage pep8 redis server shell test
 
 # Project and environment settings
 APP = flask_redis
 PROJECT = .
 
 ENV ?= env
-VENV = $(shell python -c "import sys; print(1 if hasattr(sys, 'real_prefix') else 0);")
+VENV = $(shell python -c 'import sys; print(1 if hasattr(sys, "real_prefix") else "");')
 
-ifeq ($(VENV),)
+ifneq ($(VENV),)
 	NOSETESTS = nosetests
 	PEP8 = flake8
 	PYTHON = PYTHONPATH=.:.. python
