@@ -1,7 +1,0 @@
-coverage==3.5.2
-Flask==0.9
-Flask-Script==0.4.0
-Flask-Testing==0.4
-pysandbox==1.5
-redis==2.6.2
-unittest2==0.5.1

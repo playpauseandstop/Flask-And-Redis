@@ -1,5 +1,13 @@
+"""
+=====================
+testapp.scenarios.run
+=====================
+
+Run Python scenario in secured Sandbox.
+
+"""
+
 import time
-import types
 
 from flask.ext.redis import Redis
 from sandbox import Sandbox, proxy
@@ -21,7 +29,7 @@ def run_scenario(redis, scenario):
     start = time.time()
 
     for raw in scenario.splitlines():
-        line = 'result = {0}'.format(raw) if not '=' in raw else raw
+        line = 'result = {0}'.format(raw) if '=' not in raw else raw
         sandbox.execute(line, {}, data)
         results.append((raw, data['result'] if 'result' in data else None))
 

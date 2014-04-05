@@ -1,3 +1,12 @@
+"""
+========================
+testapp.tests.test_views
+========================
+
+Test web UI for Flask-And-Redis test project.
+
+"""
+
 from flask import url_for
 from sandbox import Sandbox
 from sandbox.recursion import SetRecursionLimit

@@ -1,42 +1,51 @@
-.PHONY: bootstrap clean distclean killredis manage redis server shell test
+.PHONY: bootstrap clean distclean killredis manage pep8 redis server shell test
 
 # Project and environment settings
-ENV ?= env
-ENV24 = $(ENV)-2.4
-ENV26 = $(ENV)-2.6
+APP = flask_redis
 PROJECT = .
 
-# Python settings
-PYTHON = PYTHONPATH=.. $(ENV)/bin/python
-PYTHON24 = PYTHONPATH=.. $(ENV24)/bin/python
-PYTHON26 = PYTHONPATH=.. $(ENV26)/bin/python
+ENV ?= env
+VENV = $(shell python -c "import sys; print(1 if hasattr(sys, 'real_prefix') else 0);")
 
-MANAGE = $(PYTHON) $(PROJECT)/manage.py
-MANAGE24 = $(PYTHON) $(PROJECT)/manage.py
-MANAGE26 = $(PYTHON) $(PROJECT)/manage.py
+ifeq ($(VENV),)
+	NOSETESTS = nosetests
+	PEP8 = flake8
+	PYTHON = PYTHONPATH=.:.. python
+else
+	NOSETESTS = $(ENV)/bin/nosetests
+	PEP8 = $(ENV)/bin/flake8
+	PYTHON = PYTHONPATH=.:.. $(ENV)/bin/python
+endif
 
 # Server settings
-HOST ?= 0.0.0.0
-PORT ?= 4353
+SERVER_HOST ?= 0.0.0.0
+PORT ?= 8300
 
 # Test settings
-TEST_ARGS ?= -vf
+COVERAGE_DIR ?= /tmp/$(APP)-coverage
+TEST_ARGS ?=
 
 bootstrap:
 	bootstrapper
 
 clean:
-	find . -name '*.pyc' -delete
+	find . -name "*.pyc" -delete
 
 distclean: clean
-	rm -rf ../build ../dist $(ENV) $(ENV24)
+	rm -rf ../build ../dist $(ENV)
 
 killredis:
 	-kill `ps -o "pid,command" | grep "redis-server redis/backup.conf" | grep -v grep | awk '{print $$1}'`
+	-kill `ps -o "pid,command" | grep "redis-server 127.0.0.1:6380" | grep -v grep | awk '{print $$1}'`
 	-kill `ps -o "pid,command" | grep "redis-server redis/slave.conf" | grep -v grep | awk '{print $$1}'`
+	-kill `ps -o "pid,command" | grep "redis-server 127.0.0.1:6381" | grep -v grep | awk '{print $$1}'`
 
 manage:
-	$(MANAGE) $(COMMAND)
+	$(PYTHON) $(PROJECT)/manage.py $(COMMAND)
+
+pep8:
+	$(PEP8) ../$(APP).py
+	$(PEP8) --exclude=$(ENV) $(PROJECT)
 
 redis:
 	[ ! -d redis/backup/ ] && mkdir redis/backup/ || :
@@ -46,12 +55,12 @@ redis:
 	redis-server redis/slave.conf > redis/slave.log &
 
 server:
-	$(MANAGE) runserver -t $(HOST) -p $(PORT)
+	COMMAND="runserver -t $(SERVER_HOST) -p $(PORT)" $(MAKE) manage
 
 shell:
-	$(MANAGE) shell
+	COMMAND=shell $(MAKE) manage
 
-test:
-	PYTHONPATH=.:.. $(ENV)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
-	PYTHONPATH=.:.. $(ENV24)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
-	PYTHONPATH=.:.. $(ENV26)/bin/unit2 discover $(TEST_ARGS) $(PROJECT)/
+test: clean pep8
+	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
+	--with-coverage --cover-branches --cover-erase --cover-package=$(APP) \
+	--cover-html --cover-html-dir="$(COVERAGE_DIR)"

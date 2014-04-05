@@ -1,6 +1,13 @@
-import os
+"""
+=========================
+testapp.scenarios.default
+=========================
 
-from decimal import ROUND_UP, Decimal
+Convert redis scenarios to Python one.
+
+"""
+
+import os
 
 import flask_redis
 import redis

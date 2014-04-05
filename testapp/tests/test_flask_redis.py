@@ -1,3 +1,12 @@
+"""
+==============================
+testapp.tests.test_flask_redis
+==============================
+
+Test Flask-And-Redis extension.
+
+"""
+
 from flask.ext.redis import Redis
 from redis import StrictRedis
 from redis.exceptions import ConnectionError

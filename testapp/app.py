@@ -1,5 +1,13 @@
-import os
-import sys
+"""
+===========
+testapp.app
+===========
+
+Test application for Flask-And-Redis extension. Shows information about Redis
+server and able to run Python/Redis scenarios.
+
+"""
+
 import traceback
 
 from flask import Flask, redirect, render_template, request, url_for

@@ -1,4 +1,16 @@
-from unittest2 import TestCase as UnitTestCase
+"""
+====================
+testapp.tests.common
+====================
+
+Common test case class for tests.
+
+"""
+
+try:
+    from unittest2 import TestCase as UnitTestCase
+except ImportError:
+    from unittest import TestCase as UnitTestCase
 
 from flask.ext.testing import TestCase as BaseTestCase
 
