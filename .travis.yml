@@ -30,9 +30,18 @@ install:
   - pip install -r testapp/requirements.txt --use-mirrors
   - pip install -I Flask==$FLASK_VERSION
   - pip install -I redis==$REDIS_VERSION
-  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install unittest2; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install unittest2==0.5.1; fi
   - pip install -e .
 
 before_script: "make -C testapp/ redis"
 script: "make -C testapp/ test"
 after_script: "make -C testapp/ killredis"
+
+matrix:
+  allow_failures:
+    - python: pypy
+  exclude:
+    - python: 3.3
+      env: FLASK_VERSION=0.8
+    - python: 3.3
+      env: FLASK_VERSION=0.9
