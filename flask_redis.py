@@ -1,3 +1,12 @@
+"""
+===========
+flask_redis
+===========
+
+Simple as dead support of Redis database for Flask apps.
+
+"""
+
 import inspect
 import urlparse
 
@@ -39,7 +48,7 @@ class Redis(object):
         :param config_prefix: Config prefix to use. By default: 'REDIS'
         """
         # Put redis to application extensions
-        if not 'redis' in app.extensions:
+        if 'redis' not in app.extensions:
             app.extensions['redis'] = {}
 
         # Which config prefix to use, custom or default one?

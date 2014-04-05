@@ -1,19 +1,38 @@
 language: python
 services: redis-server
+
 python:
- - "2.6"
- - "2.7"
+  - 2.6
+  - 2.7
+  - 3.3
+  - pypy
+
 env:
- - FLASK_VERSION=0.8 REDIS_VERSION=2.4.13
- - FLASK_VERSION=0.9 REDIS_VERSION=2.4.13
- - FLASK_VERSION=0.8 REDIS_VERSION=2.6.2
- - FLASK_VERSION=0.9 REDIS_VERSION=2.6.2
- - FLASK_VERSION=0.8 REDIS_VERSION=2.7.4
- - FLASK_VERSION=0.9 REDIS_VERSION=2.7.4
+  - FLASK_VERSION=0.8 REDIS_VERSION=2.4.13
+  - FLASK_VERSION=0.8 REDIS_VERSION=2.6.2
+  - FLASK_VERSION=0.8 REDIS_VERSION=2.7.6
+  - FLASK_VERSION=0.8 REDIS_VERSION=2.8.0
+  - FLASK_VERSION=0.8 REDIS_VERSION=2.9.1
+
+  - FLASK_VERSION=0.9 REDIS_VERSION=2.4.13
+  - FLASK_VERSION=0.9 REDIS_VERSION=2.6.2
+  - FLASK_VERSION=0.9 REDIS_VERSION=2.7.4
+  - FLASK_VERSION=0.9 REDIS_VERSION=2.8.0
+  - FLASK_VERSION=0.9 REDIS_VERSION=2.9.1
+
+  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.4.13
+  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.6.2
+  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.7.4
+  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.8.0
+  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.9.1
+
 install:
- - "pip install -r testapp/requirements.txt --use-mirrors"
- - "pip install -I Flask==$FLASK_VERSION"
- - "pip install -I redis==$REDIS_VERSION"
- - "pip install -e ."
+  - pip install -r testapp/requirements.txt --use-mirrors
+  - pip install -I Flask==$FLASK_VERSION
+  - pip install -I redis==$REDIS_VERSION
+  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install unittest2; fi
+  - pip install -e .
+
 before_script: "make -C testapp/ redis"
-script: "unit2 discover -s testapp/"
+script: "make -C testapp/ test"
+after_script: "make -C testapp/ killredis"
