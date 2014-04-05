@@ -140,20 +140,20 @@
       </fieldset>
     </form>
 
-    <script type="text/javascript"><!--
-      var scenario = document.getElementById("id_scenario");
-      var scenarioType = document.getElementById("id_scenario_type");
-      var link = document.getElementById("fill-scenario");
+    <script type="text/javascript">
+      var scenario = document.getElementById("id_scenario"),
+          scenarioType = document.getElementById("id_scenario_type"),
+          link = document.getElementById("fill-scenario");
 
-      link.onclick = function() {
+      link.addEventListener("click", function(event) {
+        event.preventDefault();
         if (scenarioType.value == "python") {
-          scenario.value = {{ scenario_python|tojson|safe }};
+          scenario.value = {{ safe_scenario_python }};
         }
         else {
-          scenario.value = {{ scenario_redis|tojson|safe }};
+          scenario.value = {{ safe_scenario_redis }};
         }
-        return false;
-      };
-    --></script>
+      });
+    </script>
   </article>
 {% endblock %}

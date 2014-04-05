@@ -8,11 +8,13 @@ server and able to run Python/Redis scenarios.
 
 """
 
+import json
 import traceback
 
 from flask import Flask, redirect, render_template, request, url_for
 from flask.ext.redis import Redis
 from flask.ext.script import Manager
+from jinja2.filters import do_mark_safe
 
 import settings
 
@@ -49,11 +51,12 @@ def home():
     Show basic information about server and add form to test server.
     """
     instance = redis_instance(request.args.get('server', ''))
+    python_scenario = convert_scenario(SCENARIO)
 
     context = {
         'info': instance.info(),
-        'scenario_python': convert_scenario(SCENARIO),
-        'scenario_redis': SCENARIO,
+        'safe_scenario_python': do_mark_safe(json.dumps(python_scenario)),
+        'safe_scenario_redis': do_mark_safe(json.dumps(SCENARIO)),
         'server': instance.server,
     }
 
