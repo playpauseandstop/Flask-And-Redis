@@ -8,11 +8,11 @@ ENV ?= env
 VENV = $(shell python -c 'import sys; print(1 if hasattr(sys, "real_prefix") else "");')
 
 ifneq ($(VENV),)
-	NOSETESTS = nosetests
+	NOSETESTS = PYTHONPATH=.:.. nosetests
 	PEP8 = flake8
 	PYTHON = PYTHONPATH=.:.. python
 else
-	NOSETESTS = $(ENV)/bin/nosetests
+	NOSETESTS = PYTHONPATH=.:.. $(ENV)/bin/nosetests
 	PEP8 = $(ENV)/bin/flake8
 	PYTHON = PYTHONPATH=.:.. $(ENV)/bin/python
 endif
