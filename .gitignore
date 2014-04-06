@@ -14,5 +14,6 @@ testapp/redis/backup.log
 testapp/redis/slave.pid
 testapp/redis/slave.log
 testapp/settings_local.py
+testapp/stdout
 
 MANIFEST

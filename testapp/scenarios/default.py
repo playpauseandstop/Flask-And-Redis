@@ -102,7 +102,7 @@ def convert_scenario(scenario):
         args = list(args)
 
         for i, arg in enumerate(args):
-            if not isinstance(arg, basestring):
+            if not isinstance(arg, flask_redis.string_types):
                 args[i] = str(arg)
             elif arg.isdigit():
                 continue
