@@ -8,6 +8,7 @@ Simple as dead support of Redis database for Flask apps.
 """
 
 import inspect
+import sys
 import urlparse
 
 from redis import StrictRedis
@@ -17,7 +18,13 @@ from werkzeug.utils import import_string
 __all__ = ('Redis', )
 
 
+__author = 'Igor Davydenko'
+__license__ = 'BSD License'
 __version__ = '0.5'
+
+
+IS_PY3 = sys.version_info[0] == 3
+string_types = (str if IS_PY3 else basestring, )  # noqa
 
 
 class Redis(object):
@@ -71,7 +78,7 @@ class Redis(object):
         klass = app.config.get(key('CLASS'), StrictRedis)
 
         # Import connection class if it stil path notation
-        if isinstance(klass, basestring):
+        if isinstance(klass, string_types):
             klass = import_string(klass)
 
         # Should we use URL configuration
