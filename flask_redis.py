@@ -98,12 +98,14 @@ class Redis(object):
             db = url.path.replace('/', '')
             app.config[key('DB')] = db if db.isdigit() else None
 
-        # If host startswith file:// or / use it as unix socket path
-        host = app.config[key('HOST')]
+        # Host is not a mandatory key if you want to use connection pool.
+        if key('HOST') in app.config:
+            # If host startswith file:// or / use it as unix socket path
+            host = app.config[key('HOST')]
 
-        if host.startswith('file://') or host.startswith('/'):
-            app.config.pop(key('HOST'))
-            app.config[key('UNIX_SOCKET_PATH')] = host
+            if host.startswith('file://') or host.startswith('/'):
+                app.config.pop(key('HOST'))
+                app.config[key('UNIX_SOCKET_PATH')] = host
 
         # Read connection args spec, exclude self from list of possible
         args = inspect.getargspec(klass.__init__).args
