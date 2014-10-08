@@ -4,6 +4,7 @@
 .tox/
 .coverage
 
+.idea/
 build/
 dist/
 testapp/env/
