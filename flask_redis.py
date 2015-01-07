@@ -9,7 +9,11 @@ Simple as dead support of Redis database for Flask apps.
 
 import inspect
 import sys
-import urlparse
+
+try:
+    import urllib.parse as urlparse
+except ImportError:
+    import urlparse
 
 from redis import StrictRedis
 from werkzeug.utils import import_string
@@ -20,7 +24,7 @@ __all__ = ('Redis', )
 
 __author = 'Igor Davydenko'
 __license__ = 'BSD License'
-__version__ = '0.5'
+__version__ = '0.6a1'
 
 
 IS_PY3 = sys.version_info[0] == 3
@@ -28,26 +32,32 @@ string_types = (str if IS_PY3 else basestring, )  # noqa
 
 
 class Redis(object):
-    """
-    Simple as dead support of Redis database for Flask apps.
-    """
+
+    """Simple as dead support of Redis database for Flask apps."""
+
     def __init__(self, app=None, config_prefix=None):
-        """
-        If app argument provided then initialize redis connection using
+        """Initialize Redis extension for Flask application.
+
+        If ``app`` argument provided then initialize redis connection using
         application config values.
 
-        If no app argument provided you should do initialization later with
+        If no ``app`` argument provided you should do initialization later with
         :meth:`init_app` method.
 
-        :param app: Flask application instance.
-        :param config_prefix: Config prefix to use.
+        Generally extension expects configuration to be prefixed with ``REDIS``
+        config prefix, to customize things pass different ``config_prefix``
+        here or on calling :meth:`init_app` method. For example, if you have
+        URL to Redis in ``CACHE_URL`` config key, you should pass
+        ``config_prefix='CACHE'`` to extension.
+
+        :param app: :class:`flask.Flask` application instance.
+        :param config_prefix: Config prefix to use. By default: 'REDIS'
         """
         if app is not None:
             self.init_app(app, config_prefix)
 
     def init_app(self, app, config_prefix=None):
-        """
-        Actual method to read redis settings from app configuration,
+        """Actual method to read redis settings from app configuration,
         initialize redis connection and copy all public connection methods to
         current instance.
 
@@ -98,14 +108,12 @@ class Redis(object):
             db = url.path.replace('/', '')
             app.config[key('DB')] = db if db.isdigit() else None
 
-        # Host is not a mandatory key if you want to use connection pool.
-        if key('HOST') in app.config:
-            # If host startswith file:// or / use it as unix socket path
-            host = app.config[key('HOST')]
-
-            if host.startswith('file://') or host.startswith('/'):
-                app.config.pop(key('HOST'))
-                app.config[key('UNIX_SOCKET_PATH')] = host
+        # Host is not a mandatory key if you want to use connection pool. But
+        # when present and starts with file:// or / use it as unix socket path
+        host = app.config.get(key('HOST'))
+        if host and (host.startswith('file://') or host.startswith('/')):
+            app.config.pop(key('HOST'))
+            app.config[key('UNIX_SOCKET_PATH')] = host
 
         # Read connection args spec, exclude self from list of possible
         args = inspect.getargspec(klass.__init__).args
@@ -124,8 +132,9 @@ class Redis(object):
         self._include_public_methods(connection)
 
     def _include_public_methods(self, connection):
-        """
-        Include public methods from connection instance to current instance.
+        """Include public methods from Redis connection to current instance.
+
+        :param connection: Redis connection instance.
         """
         for attr in dir(connection):
             value = getattr(connection, attr)
