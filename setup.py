@@ -2,6 +2,7 @@
 
 import os
 import re
+import sys
 
 from distutils.core import setup
 
@@ -9,8 +10,15 @@ from distutils.core import setup
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
 rel = lambda *parts: os.path.abspath(os.path.join(DIRNAME, *parts))
 
-README = open(rel('README.rst')).read()
-INIT_PY = open(rel('flask_redis.py')).read()
+with open(rel('README.rst')) as handler:
+    README = handler.read()
+with open(rel('flask_redis.py')) as handler:
+    INIT_PY = handler.read()
+
+INSTALL_REQUIRES = {
+    2: ['Flask>=0.8', 'redis>=2.4.11'],
+    3: ['Flask>=0.10.1', 'redis>=2.6.2'],
+}
 VERSION = re.findall("__version__ = '([^']+)'", INIT_PY)[0]
 
 
@@ -22,13 +30,8 @@ setup(
     author='Igor Davydenko',
     author_email='playpauseandstop@gmail.com',
     url='https://github.com/playpauseandstop/Flask-And-Redis',
-    install_requires=[
-        'Flask',
-        'redis',
-    ],
-    py_modules=[
-        'flask_redis',
-    ],
+    install_requires=INSTALL_REQUIRES[sys.version_info[0]],
+    py_modules=['flask_redis'],
     platforms='any',
     classifiers=[
         'Development Status :: 4 - Beta',
