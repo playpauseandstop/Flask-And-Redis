@@ -3,10 +3,10 @@ Flask-And-Redis
 ===============
 
 .. image:: https://secure.travis-ci.org/playpauseandstop/Flask-And-Redis.png?branch=master
-    :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
+   :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
 
 .. image:: https://pypip.in/v/Flask-And-Redis/badge.png
-    :target: https://pypi.python.org/pypi/Flask-And-Redis
+   :target: https://pypi.python.org/pypi/Flask-And-Redis
 
 Simple as dead support of Redis database for Flask apps.
 
@@ -17,7 +17,7 @@ Simple as dead support of Redis database for Flask apps.
 Requirements
 ============
 
-* `Python <http://www.python.org>`_ 2.6 or 2.7
+* `Python <http://www.python.org>`_ 2.6, 2.7 and 3.3 or higher
 * `Flask <http://flask.pocoo.org/>`_ 0.8 or higher
 * `redis-py <https://github.com/andymccurdy/redis-py>`_ 2.4 or higher
 
