@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}Available Threads{% endblock %}
+{% block content %}
+
+  {% if threads %}
+    <h2>Available Threads</h2>
+    <dl>
+      {% for thread_uid, thread in iteritems(threads) %}
+        <dt>
+          <strong>
+            <a href="{{ url_for("comments", thread_uid=thread_uid) }}">{{ thread.subject }}</a>
+            {% if thread.comments_counter %}({{ thread.comments_counter }}){% endif %}
+          </strong>
+          {% if thread.author == g.username %}
+            &mdash;
+            <small>
+              <a href="{{ url_for("delete_thread", thread_uid=thread_uid) }}" style="color: darkred;">Delete</a>
+            </small>
+          {% endif %}
+        </dt>
+        <dd>
+          Started by <strong>{{ thread.author }}</strong>
+          @ {{ macros.time_tag(thread.timestamp) }}{% if thread.last_comment %}.
+          Last comment by <strong>{{ thread.last_comment.author }}</strong>
+          @ {{ macros.time_tag(thread.last_comment.timestamp) }}{% endif %}
+        </dd>
+      {% endfor %}
+    </dl>
+  {% else %}
+    <h2>No Threads Available</h2>
+    <p>
+      Use form below to start new Thread.
+    </p>
+  {% endif %}
+
+  <hr>
+
+  <form action="{{ url_for("start_thread") }}" method="post">
+    <fieldset>
+      <legend>Start new Thread</legend>
+
+      <p>
+        Logged in as <strong>{{ g.username }}</strong><br>
+        <small>Not you? <a href="{{ url_for("quit") }}">Quit</a></small>
+      </p>
+
+      <p>
+        <label for="subject"><strong>Subject</strong></label><br>
+        <input autocomplete="off" autofocus id="subject" name="subject"
+               required size="80" type="text">
+      </p>
+
+      <p>
+        <label for="comment">Comment</label><br>
+        <textarea cols="80" id="comment" name="comment" rows="5"></textarea>
+      </p>
+
+      <p>
+        <button type="submit"><strong>Submit</strong></button>
+      </p>
+    </fieldset>
+  </form>
+
+{% endblock %}

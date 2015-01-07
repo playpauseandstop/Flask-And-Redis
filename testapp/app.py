@@ -3,110 +3,110 @@
 testapp.app
 ===========
 
-Test application for Flask-And-Redis extension. Shows information about Redis
-server and able to run Python/Redis scenarios.
+Implement Flask app for Comments app and provide abilit to run development
+server.
 
 """
 
-import json
-import traceback
+from __future__ import print_function
 
-from flask import Flask, redirect, render_template, request, url_for
-from flask.ext.redis import Redis
-from flask.ext.script import Manager
-from jinja2.filters import do_mark_safe
+import datetime
+import os
+import sys
 
+from flask import Flask, g, session
+from flask_lazyviews import LazyViews
+from flask_redis import Redis
+
+import constants
 import settings
 
-from scenarios.default import SCENARIO, convert_scenario
-from scenarios.run import run_scenario
+from compat import iteritems
 
 
-# Initialize simple Flask application
-app = Flask(__name__)
-app.config.from_object(settings)
+def create_app(**options):
+    """Factory function to create test application.
 
-# Initialize script extension
-manager = Manager(app)
-
-# Setup Redis conection or connections with multiple services
-redis = Redis(app)
-redis_backup = Redis()
-redis_slave = Redis()
-
-
-@app.before_first_request
-def init_multiple_redis():
+    :param \*\*options: Override default settings from given options.
+    :type \*\*options: dict
     """
-    Initialize multiple redis instances if necessary.
-    """
-    if app.config['MULTIPLE_REDIS_SERVERS']:
-        redis_backup.init_app(app, 'REDIS_BACKUP')
-        redis_slave.init_app(app, 'REDIS_SLAVE')
+    # Initialize application and configure it from settings and given options
+    app = Flask('testapp')
+    app.config.from_object(settings)
+    app.config.update(options)
+
+    # Put necessary filter & globals to Jinja environment
+    app.jinja_env.filters['format'] = format
+    app.jinja_env.globals['constants'] = constants
+    app.jinja_env.globals.update({
+        'constants': constants,
+        'float': float,
+        'fromtimestamp': datetime.datetime.fromtimestamp,
+        'iteritems': iteritems,
+    })
+
+    # Register Redis databases
+    Redis(app, 'REDIS_LINKS')
+    Redis(app, 'REDIS_CONTENT')
+
+    # Setup all available routes
+    views = LazyViews(app, 'views')
+    views.add('/', 'index', methods=('GET', 'POST'))
+    views.add('/comments/<thread_uid>', 'comment', methods=('POST', ))
+    views.add('/comments/<thread_uid>', 'comments')
+    views.add('/quit', 'quit')
+    views.add('/threads', 'start_thread', methods=('POST', ))
+    views.add('/threads', 'threads')
+    views.add('/threads/<thread_uid>/delete',
+              'delete_thread',
+              methods=('GET', 'POST'))
+
+    # Put username from session to globals before each request
+    @app.before_request
+    def global_username():
+        key = constants.USERNAME_KEY.format(app.config['KEY_PREFIX'])
+        g.username = session.get(key) or ''
+
+    return app
 
 
-@app.route('/')
-def home():
-    """
-    Show basic information about server and add form to test server.
-    """
-    instance = redis_instance(request.args.get('server', ''))
-    python_scenario = convert_scenario(SCENARIO)
+def main():
+    """Run test server for Comments app."""
+    counter = len(sys.argv)
+    host, port = constants.SERVER_HOST, constants.SERVER_PORT
 
-    context = {
-        'info': instance.info(),
-        'safe_scenario_python': do_mark_safe(json.dumps(python_scenario)),
-        'safe_scenario_redis': do_mark_safe(json.dumps(SCENARIO)),
-        'server': instance.server,
-    }
+    if counter == 2:
+        mixed = sys.argv[1]
+        if ':' in mixed:
+            host, port = mixed.split(':')
+        else:
+            port = mixed
 
-    return render_template('index.html', **context)
-
-
-def redis_instance(server):
-    """
-    Return redis instance by server suffix.
-    """
-    key = 'redis_{0}'.format(server) if server else 'redis'
-    instance = globals()[key]
-    instance.server = server
-    return instance
-
-
-@app.route('/test', methods=('GET', 'POST'))
-def test():
-    """
-    Test Redis server, using scenario from POST request.
-    """
-    if request.method == 'GET':
-        return redirect(url_for('home'))
-
-    instance = redis_instance(request.form.get('server', ''))
-    scenario_type = request.form.get('scenario_type')
-    scenario = request.form.get('scenario')
-
-    if not scenario or not scenario_type:
-        return render_template('test.html', error='required_field')
-
-    if scenario_type == 'redis':
         try:
-            scenario = convert_scenario(scenario)
-        except ValueError as e:
-            return render_template('test.html', error='convert', exception=e)
+            port = int(port)
+        except (TypeError, ValueError):
+            return usage()
+    elif counter > 2:
+        return usage()
 
     try:
-        results = run_scenario(instance, scenario)
-    except Exception as e:
-        kwargs = {'error': 'exception',
-                  'exception': e,
-                  'traceback': traceback.format_exc()}
-        return render_template('test.html', **kwargs)
+        debug = int(os.environ.get('FLASK_DEBUG'))
+    except (TypeError, ValueError):
+        debug = None
 
-    context = {
-        'results': results,
-        'scenario': scenario,
-        'scenario_type': scenario_type,
-        'server': instance.server,
-    }
+    return app.run(host, port, debug=debug)
 
-    return render_template('test.html', **context)
+
+def usage():
+    """Print simple usage note."""
+    print('Usage: {0} HOST:PORT'.format(os.path.basename(sys.argv[0])),
+          file=sys.stderr)
+    return True
+
+
+#: Global Comments app instance
+app = create_app()
+
+
+if __name__ == '__main__':
+    sys.exit(int(main()))

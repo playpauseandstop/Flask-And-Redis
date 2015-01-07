@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}Delete Thread?{% endblock %}
+{% block content %}
+
+  <h2>Delete Thread: {{ thread.subject }}</h2>
+  <p>
+    <small>
+      Started @ {{ macros.time_tag(thread.timestamp) }}<br>
+      {{ macros.backlink() }}<br>
+      {{ macros.backlink(url_for("comments", thread_uid=thread_uid), "thread: " + thread.subject) }}
+    </small>
+  </p>
+
+  <hr>
+
+  <form action="{{ url_for("delete_thread", thread_uid=thread_uid) }}" method="post">
+    <fieldset>
+      <legend>Confirm Deleting Thread</legend>
+      <p>
+        If you sure to delete "{{ thread.subject }}" thread type "confirm" in
+        input below<br>
+        <input autocomplete="off" autofocus name="confirm" required type="text"
+               size="40">
+      </p>
+      <p>
+        <button type="submit"><strong>Submit</strong></button>
+      </p>
+    </fieldset>
+  </form>
+
+{% endblock %}

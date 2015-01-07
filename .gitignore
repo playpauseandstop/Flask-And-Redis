@@ -1,20 +1,17 @@
 *.pyc
 *.pyo
 
-.tox/
-.coverage
+*egg*/
+__pycache__/
 
 .idea/
+.tox/
+.coverage
+.python-version
+
 build/
 dist/
 testapp/env/
-testapp/redis/backup/
-testapp/redis/slave/
-testapp/redis/backup.pid
-testapp/redis/backup.log
-testapp/redis/slave.pid
-testapp/redis/slave.log
 testapp/settings_local.py
-testapp/stdout
 
 MANIFEST

@@ -2,25 +2,36 @@
 <html>
 
 <head>
-  <title>{% block title %}Flask-And-Redis test project{% endblock %}</title>
-
-  <link href="{{ url_for("static", filename="css/screen.css") }}" media="screen,projection,tv" rel="stylesheet" type="text/css">
+  <meta charset="utf-8">
+  <title>{% block title %}{% endblock %} &middot; Flask-And-Redis</title>
+  {% block extra_head %}{% endblock %}
 </head>
 
 <body>
 
-  <header>
-    <h1>{{ self.title() }}</h1>
-    <div class="github">
-      <a class="github-ribbon" href="https://github.com/playpauseandstop/Flask-And-Redis" title="Fork me on GitHub">
-        <img src="{{ url_for("static", filename="img/github.png") }}" alt="Fork me on GitHub">
-      </a>
-    </div>
-  </header>
+  <h1>Comments App</h1>
 
-  <hr>
-
+  {% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+      <ul>
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
   {% block content %}{% endblock %}
+
+  <footer>
+    <p>
+      This is test application for
+      <a href="https://github.com/playpauseandstop/Flask-And-Redis">Flask-And-Redis</a>
+      extension. Source code available on GitHub.
+    </p>
+    <p><small>All data wiped every 12 hours.</small></p>
+  </footer>
+
+  {% block extra_body %}{% endblock %}
 
 </body>
 

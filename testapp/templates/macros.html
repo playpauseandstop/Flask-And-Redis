@@ -1,0 +1,12 @@
+{% macro backlink(url="", title="") -%}
+  {% if not url and not title %}
+    <a href="{{ url_for("threads") }}">&laquo; Return to all threads</a>
+  {% else %}
+    <a href="{{ url }}">&laquo; Return to {{ title }}</a>
+  {% endif %}
+{%- endmacro %}
+
+{% macro time_tag(timestamp) -%}
+  {% set dt = fromtimestamp(float(timestamp)) %}
+  <time datetime="{{ dt.isoformat() }}">{{ dt|format("%H:%M, %b %d, %Y") }}</time>
+{%- endmacro %}

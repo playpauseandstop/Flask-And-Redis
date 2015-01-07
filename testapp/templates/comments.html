@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros %}
+{% block title %}{{ thread.subject }}{% endblock %}
+{% block content %}
+
+  <h2>{{ thread.subject }} ({{ thread.comments_counter }})</h2>
+  <p>
+    <small>
+      Started by <strong>{{ thread.author }}</strong> @ {{ macros.time_tag(thread.timestamp) }}.
+      {% if g.username == thread.author %}
+        <a href="{{ url_for("delete_thread", thread_uid=thread_uid) }}" style="color: darkred;">Delete</a>
+      {% endif %}
+      <br>
+      {{ macros.backlink() }}
+    </small>
+  </p>
+
+  <hr>
+
+  {% for comment_uid, comment in iteritems(comments) %}
+    <p id="{{ comment_uid }}">
+      <span style="white-space: pre;">{{ comment.text }}</span><br>
+      <small>
+        <strong>{{ comment.author }}</strong> @ {{ macros.time_tag(comment.timestamp) }}
+      </small>
+    </p>
+  {% endfor %}
+
+  <form action="{{ url_for("comment", thread_uid=thread_uid) }}" method="post">
+    <fieldset>
+      <legend>Add New Comment</legend>
+      <p>
+        Logged in as <strong>{{ g.username }}</strong><br>
+        <small>
+          Not you? <a href="{{ url_for("quit") }}">Quit</a>
+        </small>
+      </p>
+      <p>
+        <textarea autofocus cols="80" id="text" name="text"
+                  placeholder="Text..." required rows="5"></textarea>
+      </p>
+      <p>
+        <button type="submit"><strong>Submit</strong></button>
+      </p>
+    </fieldset>
+  </form>
+
+{% endblock %}
