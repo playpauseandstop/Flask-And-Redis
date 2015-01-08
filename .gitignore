@@ -1,17 +1,20 @@
 *.pyc
 *.pyo
 
-*egg*/
-__pycache__/
-
-.idea/
-.tox/
-.coverage
-.python-version
+*.egg
+*.egg-info
 
 build/
 dist/
+docs/_build/
 testapp/env/
 testapp/settings_local.py
 
+__pycache__/
+.idea/
+.tox/
+
 MANIFEST
+
+.coverage
+.python-version

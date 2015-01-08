@@ -51,7 +51,7 @@ class Redis(object):
         ``config_prefix='CACHE'`` to extension.
 
         :param app: :class:`flask.Flask` application instance.
-        :param config_prefix: Config prefix to use. By default: 'REDIS'
+        :param config_prefix: Config prefix to use. By default: ``REDIS``
         """
         if app is not None:
             self.init_app(app, config_prefix)
@@ -63,7 +63,7 @@ class Redis(object):
         instance.
 
         :param app: :class:`flask.Flask` application instance.
-        :param config_prefix: Config prefix to use. By default: 'REDIS'
+        :param config_prefix: Config prefix to use. By default: ``REDIS``
         """
         # Put redis to application extensions
         if 'redis' not in app.extensions:
