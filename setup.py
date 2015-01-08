@@ -4,7 +4,7 @@ import os
 import re
 import sys
 
-from distutils.core import setup
+from setuptools import setup
 
 
 DIRNAME = os.path.abspath(os.path.dirname(__file__))
