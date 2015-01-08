@@ -125,13 +125,19 @@ def list_comments(thread_uid):
 
 def list_threads():
     """List all available threads in most efficient way."""
+    def order(item):
+        """Order Threads by latest comment or start time."""
+        thread = item[1]
+        timestamp = thread['timestamp']
+        return thread.get('last_comment', {}).get('timestamp') or timestamp
+
     # Read Threads from Links and Content databases
     with content.pipeline() as pipe:
         uids = []
         for thread_uid in links.lrange(build_key(THREADS_KEY), 0, -1):
             pipe.hgetall(build_key(THREAD_KEY, thread_uid))
             uids.append(thread_uid)
-        threads = OrderedDict(zip(uids, pipe.execute()))
+        threads = dict(zip(uids, pipe.execute()))
 
     # Make another multi request for threads' counters and last comments where
     # possible
@@ -163,7 +169,7 @@ def list_threads():
         for thread_uid, comment in response:
             threads[thread_uid]['last_comment'] = comment
 
-    return threads
+    return OrderedDict(sorted(iteritems(threads), key=order, reverse=True))
 
 
 def start_thread(author, subject, comment=None):

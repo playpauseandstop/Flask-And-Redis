@@ -1,4 +1,4 @@
-.PHONY: bootstrap clean distclean pep8 server shell test
+.PHONY: bootstrap clean distclean pep8 server shell test wipe
 
 # Project and environment settings
 APP = flask_redis
@@ -53,3 +53,6 @@ test: clean pep8
 	--cover-package=$(APP) --cover-html --cover-html-dir="$(COVERAGE_DIR)"
 	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
 	-a testapp
+
+wipe:
+	$(PYTHON) wipe.py
