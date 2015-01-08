@@ -11,6 +11,19 @@ Constants to use in Comments app.
 SERVER_HOST = '0.0.0.0'
 SERVER_PORT = 8300
 
+# Error messages
+ERRORS = {
+    'comment': {
+        'text': 'Invalid value for comment text.',
+    },
+    'delete_thread': {
+        'confirm': 'Cannot confirm deleting thread.',
+    },
+    'start_thread': {
+        'subject': 'Invalid value for thread subject.',
+    },
+}
+
 # Redis keys
 COMMENT_KEY = '{0}:thread:{1}:{2}'
 THREAD_KEY = '{0}:thread:{1}'

@@ -43,6 +43,7 @@ def create_app(**options):
         'float': float,
         'fromtimestamp': datetime.datetime.fromtimestamp,
         'iteritems': iteritems,
+        'len': len,
     })
 
     # Register Redis databases
@@ -60,6 +61,10 @@ def create_app(**options):
     views.add('/threads/<thread_uid>/delete',
               'delete_thread',
               methods=('GET', 'POST'))
+    views.add_error(400, 'error')
+    views.add_error(403, 'error')
+    views.add_error(404, 'error')
+    views.add_error(Exception, 'error')
 
     # Put username from session to globals before each request
     @app.before_request

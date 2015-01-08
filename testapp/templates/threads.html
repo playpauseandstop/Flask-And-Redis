@@ -20,10 +20,12 @@
           {% endif %}
         </dt>
         <dd>
-          Started by <strong>{{ thread.author }}</strong>
-          @ {{ macros.time_tag(thread.timestamp) }}{% if thread.last_comment %}.
-          Last comment by <strong>{{ thread.last_comment.author }}</strong>
-          @ {{ macros.time_tag(thread.last_comment.timestamp) }}{% endif %}
+          <small>
+            Started by <strong>{{ thread.author }}</strong>
+            @ {{ macros.time_tag(thread.timestamp) }}{% if thread.last_comment %}.
+            Last comment by <strong>{{ thread.last_comment.author }}</strong>
+            @ {{ macros.time_tag(thread.last_comment.timestamp) }}{% endif %}
+          </small>
         </dd>
       {% endfor %}
     </dl>
@@ -47,8 +49,8 @@
 
       <p>
         <label for="subject"><strong>Subject</strong></label><br>
-        <input autocomplete="off" autofocus id="subject" name="subject"
-               required size="80" type="text">
+        <input autocomplete="off"{% if len(threads) < 5 %} autofocus{% endif %}
+               id="subject" name="subject" required size="80" type="text">
       </p>
 
       <p>

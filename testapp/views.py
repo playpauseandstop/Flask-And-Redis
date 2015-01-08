@@ -7,7 +7,10 @@ View functions for Comments app.
 
 """
 
+import traceback
+
 from flask import (
+    abort,
     current_app,
     flash,
     g,
@@ -18,10 +21,11 @@ from flask import (
     session,
     url_for,
 )
+from flask_redis import string_types
 
 import storage
 
-from constants import USERNAME_KEY
+from constants import ERRORS, USERNAME_KEY
 from decorators import username_required
 from utils import to_index, to_threads
 
@@ -34,7 +38,7 @@ def comment(thread_uid):
     """
     thread = storage.get_thread(thread_uid)
     if not thread:
-        return error(404)
+        abort(404)
 
     text = request.form.get('text') or ''
     if not text:
@@ -54,7 +58,7 @@ def comments(thread_uid):
     """
     thread = storage.get_thread(thread_uid, counter=True)
     if not thread:
-        return error(404)
+        abort(404)
     return render_template('comments.html',
                            comments=storage.list_comments(thread_uid),
                            thread=thread,
@@ -69,10 +73,10 @@ def delete_thread(thread_uid):
     """
     thread = storage.get_thread(thread_uid)
     if not thread:
-        return error(404)
+        abort(404)
 
     if thread['author'] != g.username:
-        return error(403)
+        abort(403)
 
     if request.method == 'GET':
         return render_template('delete_thread.html',
@@ -89,8 +93,27 @@ def delete_thread(thread_uid):
     return to_threads()
 
 
-def error(code):
-    """Show error page for HTTP and form errors."""
+def error(mixed):
+    """Show error page for HTTP and form errors.
+
+    :param mixed: String or actual catched exception.
+    """
+    status = 400
+    trace = None
+
+    if isinstance(mixed, string_types):
+        page, error = mixed.split(':')
+        message = ERRORS[page][error]
+    else:
+        message = mixed
+        trace = ''.join(traceback.format_exc())
+        if hasattr(mixed, 'code') and isinstance(mixed.code, int):
+            status = mixed.code
+
+    return make_response(
+        render_template('error.html', message=message, trace=trace),
+        status
+    )
 
 
 def index():

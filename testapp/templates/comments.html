@@ -26,6 +26,8 @@
     </p>
   {% endfor %}
 
+  <hr>
+
   <form action="{{ url_for("comment", thread_uid=thread_uid) }}" method="post">
     <fieldset>
       <legend>Add New Comment</legend>

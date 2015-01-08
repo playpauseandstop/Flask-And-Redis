@@ -58,6 +58,10 @@ class TestCommentsApp(FlaskTestCase):
     def create_app(self):
         return create_app()
 
+    def test_error_handling(self):
+        response = self.client.get('/does-not-exist.exe')
+        self.assert404(response)
+
     def test_index(self):
         response = self.client.get(self.index_url)
         self.assert200(response)

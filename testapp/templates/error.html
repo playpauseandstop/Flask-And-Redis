@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ message }}{% endblock %}
+{% block content %}
+
+  <h2>{{ message }}</h2>
+  <p>
+    <small>
+      <a href="{{ url_for("index") }}">&laquo; To index page</a><br>
+      <a href="javascript:history.back();">&laquo; To previous page</a>
+    </small>
+  </p>
+
+  {% if trace %}
+  <hr>
+  <h3>Traceback</h3>
+  <pre>{{ trace }}</pre>
+  {% endif %}
+
+{% endblock %}
