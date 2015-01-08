@@ -12,7 +12,7 @@ import sys
 
 try:
     import urllib.parse as urlparse
-except ImportError:
+except ImportError:  # pragma: no cover
     import urlparse
 
 from redis import StrictRedis
@@ -57,11 +57,12 @@ class Redis(object):
             self.init_app(app, config_prefix)
 
     def init_app(self, app, config_prefix=None):
-        """Actual method to read redis settings from app configuration,
-        initialize redis connection and copy all public connection methods to
-        current instance.
+        """
+        Actual method to read redis settings from app configuration, initialize
+        Redis connection and copy all public connection methods to current
+        instance.
 
-        :param app: Flask application instance.
+        :param app: :class:`flask.Flask` application instance.
         :param config_prefix: Config prefix to use. By default: 'REDIS'
         """
         # Put redis to application extensions
