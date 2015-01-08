@@ -33,7 +33,7 @@ env:
 install:
   - pip install -r testapp/requirements.txt
   - pip install -I Flask==$FLASK_VERSION redis==$REDIS_VERSION
-  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install unittest2==0.5.1; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install ordereddict==1.1 unittest2==0.5.1; fi
   - pip install -e .
 
 script: "make -C testapp/ test"
