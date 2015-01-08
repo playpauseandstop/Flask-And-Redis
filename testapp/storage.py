@@ -9,7 +9,10 @@ Implement working with Redis storages.
 
 import time
 
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
 
 from flask import current_app
 
@@ -21,12 +24,11 @@ from constants import (
     THREAD_COUNTER_KEY,
     THREADS_KEY,
 )
-from utils import uid
+from utils import build_key, uid
 
 
 content = current_app.extensions['redis']['REDIS_CONTENT']
 links = current_app.extensions['redis']['REDIS_LINKS']
-prefix = current_app.config['KEY_PREFIX']
 
 
 def add_comment(thread_uid, author, text):
@@ -41,20 +43,20 @@ def add_comment(thread_uid, author, text):
 
     # Store comment metadata and rewrite data about last comment for thread
     with content.pipeline() as pipe:
-        pipe.hmset(COMMENT_KEY.format(prefix, thread_uid, comment_uid), {
+        pipe.hmset(build_key(COMMENT_KEY, thread_uid, comment_uid), {
             'author': author,
             'text': text,
             'timestamp': time.time(),
         })
-        pipe.hmset(THREAD_KEY.format(prefix, thread_uid), {
+        pipe.hmset(build_key(THREAD_KEY, thread_uid), {
             'last_comment_uid': comment_uid,
         })
         pipe.execute()
 
     # Put comment to comments list and incr comments counter for thread
     with links.pipeline() as pipe:
-        pipe.rpush(THREAD_COMMENTS_KEY.format(prefix, thread_uid), comment_uid)
-        pipe.incr(THREAD_COUNTER_KEY.format(prefix, thread_uid))
+        pipe.rpush(build_key(THREAD_COMMENTS_KEY, thread_uid), comment_uid)
+        pipe.incr(build_key(THREAD_COUNTER_KEY, thread_uid))
         pipe.execute()
 
     # Comment added, everything is alright
@@ -67,18 +69,18 @@ def delete_thread(thread_uid):
     :param thread_uid: Thread unique ID.
     """
     pipe = content.pipeline()
-    pipe.delete(THREAD_KEY.format(prefix, thread_uid))
+    pipe.delete(build_key(THREAD_KEY, thread_uid))
 
-    comments_key = THREAD_COMMENTS_KEY.format(prefix, thread_uid)
+    comments_key = build_key(THREAD_COMMENTS_KEY, thread_uid)
     for comment_uid in links.lrange(comments_key, 0, -1):
-        pipe.delete(COMMENT_KEY.format(prefix, thread_uid, comment_uid))
+        pipe.delete(build_key(COMMENT_KEY, thread_uid, comment_uid))
 
     pipe.execute()
 
     with links.pipeline() as pipe:
         pipe.delete(comments_key)
-        pipe.delete(THREAD_COUNTER_KEY.format(prefix, thread_uid))
-        pipe.lrem(THREADS_KEY.format(prefix), 1, thread_uid)
+        pipe.delete(build_key(THREAD_COUNTER_KEY, thread_uid))
+        pipe.lrem(build_key(THREADS_KEY), 1, thread_uid)
         pipe.execute()
 
     return True
@@ -91,17 +93,17 @@ def get_thread(thread_uid, last_comment=False, counter=False):
     :param last_comment: Include last comment metadata or not?
     :param counter: Include comments counter or not?
     """
-    thread = content.hgetall(THREAD_KEY.format(prefix, thread_uid))
+    thread = content.hgetall(build_key(THREAD_KEY, thread_uid))
     if not thread:
         return thread
 
     last_comment_uid = thread.get('last_comment_uid')
     if last_comment and last_comment_uid:
-        comment_key = COMMENT_KEY.format(prefix, thread_uid, last_comment_uid)
+        comment_key = build_key(COMMENT_KEY, thread_uid, last_comment_uid)
         thread['last_comment'] = content.hgetall(comment_key)
 
     if counter:
-        counter_key = THREAD_COUNTER_KEY.format(prefix, thread_uid)
+        counter_key = build_key(THREAD_COUNTER_KEY, thread_uid)
         thread['comments_counter'] = links.get(counter_key)
 
     return thread
@@ -113,10 +115,10 @@ def list_comments(thread_uid):
     :param thread_uid: Thread unique UID.
     """
     with content.pipeline() as pipe:
-        comments_key = THREAD_COMMENTS_KEY.format(prefix, thread_uid)
+        comments_key = build_key(THREAD_COMMENTS_KEY, thread_uid)
         uids = []
         for comment_uid in links.lrange(comments_key, 0, -1):
-            pipe.hgetall(COMMENT_KEY.format(prefix, thread_uid, comment_uid))
+            pipe.hgetall(build_key(COMMENT_KEY, thread_uid, comment_uid))
             uids.append(comment_uid)
         return OrderedDict(zip(uids, pipe.execute()))
 
@@ -126,8 +128,8 @@ def list_threads():
     # Read Threads from Links and Content databases
     with content.pipeline() as pipe:
         uids = []
-        for thread_uid in links.lrange(THREADS_KEY.format(prefix), 0, -1):
-            pipe.hgetall(THREAD_KEY.format(prefix, thread_uid))
+        for thread_uid in links.lrange(build_key(THREADS_KEY), 0, -1):
+            pipe.hgetall(build_key(THREAD_KEY, thread_uid))
             uids.append(thread_uid)
         threads = OrderedDict(zip(uids, pipe.execute()))
 
@@ -146,7 +148,7 @@ def list_threads():
     if comments_request:
         with links.pipeline() as pipe:
             for thread_uid in iterkeys(comments_request):
-                pipe.get(THREAD_COUNTER_KEY.format(prefix, thread_uid))
+                pipe.get(build_key(THREAD_COUNTER_KEY, thread_uid))
             response = zip(iterkeys(comments_request), pipe.execute())
 
         for thread_uid, counter in response:
@@ -154,7 +156,7 @@ def list_threads():
 
         with content.pipeline() as pipe:
             for thread_uid, comment_uid in iteritems(comments_request):
-                key = COMMENT_KEY.format(prefix, thread_uid, comment_uid)
+                key = build_key(COMMENT_KEY, thread_uid, comment_uid)
                 pipe.hgetall(key)
             response = zip(iterkeys(comments_request), pipe.execute())
 
@@ -174,15 +176,12 @@ def start_thread(author, subject, comment=None):
     # Setup new UID for the Thread and add it to Links and Content storages
     thread_uid = uid()
 
-    threads_key = THREADS_KEY.format(prefix)
-    thread_key = THREAD_KEY.format(prefix, thread_uid)
-
-    content.hmset(thread_key, {
+    content.hmset(build_key(THREAD_KEY, thread_uid), {
         'author': author,
         'subject': subject,
         'timestamp': time.time(),
     })
-    links.lpush(threads_key, thread_uid)
+    links.lpush(build_key(THREADS_KEY), thread_uid)
 
     # Add comment, but only if it not empty
     if comment:

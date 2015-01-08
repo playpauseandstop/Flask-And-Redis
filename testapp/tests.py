@@ -9,21 +9,85 @@ Tests for Flask-And-Redis extension and for Comments app.
 
 from unittest import TestCase
 
-from flask import Flask
+from flask import Flask, url_for
 from flask_redis import Redis
+from flask_testing import TestCase as FlaskTestCase
+from nose.plugins.attrib import attr
 from redis import StrictRedis
 from redis.connection import UnixDomainSocketConnection
+
+from app import create_app
 
 
 TEST_REDIS_DB = 0
 TEST_REDIS_HOST = '127.0.0.1'
 TEST_REDIS_PORT = 6379
 TEST_REDIS_URL = 'redis://127.0.0.1:6379/0'
+TEST_USERNAME = 'test-username'
+
+udata = lambda response: response.data.decode(response.charset)
 
 
 class InheritFromStrictRedis(StrictRedis):
 
     """Dummy class inherited from Strict Redis."""
+
+
+@attr('testapp')
+class TestCommentsApp(FlaskTestCase):
+
+    KEY_PREFIX = 'test:far_testapp'
+    TESTING = True
+
+    def setUp(self):
+        self.index_url = url_for('index')
+        self.quit_url = url_for('quit')
+        self.start_thread_url = url_for('start_thread')
+        self.threads_url = url_for('threads')
+
+    def check_logged_in(self, username=None):
+        username = username or TEST_USERNAME
+        response = self.client.get(self.threads_url)
+        self.assert200(response)
+        self.assertIn('<strong>{0}</strong>'.format(username), udata(response))
+
+    def check_not_logged_in(self):
+        response = self.client.get(self.threads_url)
+        self.assertRedirects(response, self.index_url)
+
+    def create_app(self):
+        return create_app()
+
+    def test_index(self):
+        response = self.client.get(self.index_url)
+        self.assert200(response)
+        self.assertTemplateUsed('index.html')
+        self.assertContext('error', None)
+
+    def test_login(self):
+        response = self.client.post(self.index_url,
+                                    data={'username': TEST_USERNAME})
+        self.assertRedirects(response, self.threads_url)
+        self.check_logged_in()
+
+    def test_login_failed(self):
+        response = self.client.post(self.index_url, data={'username': ''})
+        self.assert400(response)
+        self.assertTemplateUsed('index.html')
+        self.assertContext('error', True)
+
+    def test_quit(self):
+        self.test_login()
+
+        response = self.client.get(self.quit_url)
+        self.assertRedirects(response, self.index_url)
+
+        self.check_not_logged_in()
+
+    def test_quit_not_logged_in(self):
+        self.check_not_logged_in()
+        response = self.client.get(self.quit_url)
+        self.assertRedirects(response, self.index_url)
 
 
 class TestFlaskAndRedis(TestCase):

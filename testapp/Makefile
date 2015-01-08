@@ -49,5 +49,7 @@ shell:
 
 test: clean pep8
 	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
-	--with-coverage --cover-branches --cover-erase --cover-package=$(APP) \
-	--cover-html --cover-html-dir="$(COVERAGE_DIR)"
+	-a "!testapp" --with-coverage --cover-branches --cover-erase \
+	--cover-package=$(APP) --cover-html --cover-html-dir="$(COVERAGE_DIR)"
+	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
+	-a testapp

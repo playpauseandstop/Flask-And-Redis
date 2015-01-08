@@ -11,6 +11,7 @@ from flask import (
     current_app,
     flash,
     g,
+    make_response,
     redirect,
     render_template,
     request,
@@ -112,7 +113,8 @@ def index():
 
         error = True
 
-    return render_template('index.html', error=error)
+    status = 400 if error else 200
+    return make_response(render_template('index.html', error=error), status)
 
 
 def quit():
