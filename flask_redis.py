@@ -24,7 +24,7 @@ __all__ = ('Redis', )
 
 __author = 'Igor Davydenko'
 __license__ = 'BSD License'
-__version__ = '0.6a1'
+__version__ = '0.6'
 
 
 IS_PY3 = sys.version_info[0] == 3
