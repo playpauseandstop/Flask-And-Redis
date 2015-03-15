@@ -18,6 +18,10 @@ Flask-And-Redis
     :target: https://github.com/playpauseandstop/Flask-And-Redis/blob/master/LICENSE
     :alt: BSD License
 
+.. image:: https://readthedocs.org/projects/flask-and-redis/badge/?version=latest
+    :target: http://flask-and-redis.readthedocs.org/en/latest/
+    :alt: Documentation
+
 Flask-And-Redis provides simple as dead support of `Redis <http://redis.io>`_
 database for `Flask <http://flask.pocoo.org/>`_ applications. Extension built
 around beautiful `redis-py <https://github.com/andymccurdy/redis-py>`_ library
