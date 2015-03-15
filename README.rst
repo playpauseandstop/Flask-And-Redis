@@ -2,11 +2,21 @@
 Flask-And-Redis
 ===============
 
-.. image:: https://secure.travis-ci.org/playpauseandstop/Flask-And-Redis.png?branch=master
-   :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
+.. image:: https://travis-ci.org/playpauseandstop/Flask-And-Redis.png?branch=master&style=flat
+    :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
+    :alt: Travis CI
 
-.. image:: https://pypip.in/v/Flask-And-Redis/badge.png
-   :target: https://pypi.python.org/pypi/Flask-And-Redis
+.. image:: https://pypip.in/version/Flask-And-Redis/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/Flask-And-Redis/
+    :alt: Latest Version
+
+.. image:: https://pypip.in/py_versions/Flask-And-Redis/badge.svg?style=flat
+    :target: https://pypi.python.org/pypi/Flask-And-Redis/
+    :alt: Python versions
+
+.. image:: https://pypip.in/license/Flask-And-Redis/badge.svg?style=flat
+    :target: https://github.com/playpauseandstop/Flask-And-Redis/blob/master/LICENSE
+    :alt: BSD License
 
 Flask-And-Redis provides simple as dead support of `Redis <http://redis.io>`_
 database for `Flask <http://flask.pocoo.org/>`_ applications. Extension built
