@@ -6,15 +6,15 @@ Flask-And-Redis
     :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
     :alt: Travis CI
 
-.. image:: https://pypip.in/version/Flask-And-Redis/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/v/Flask-And-Redis.svg
     :target: https://pypi.python.org/pypi/Flask-And-Redis/
     :alt: Latest Version
 
-.. image:: https://pypip.in/py_versions/Flask-And-Redis/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/pyversions/Flask-And-Redis.svg
     :target: https://pypi.python.org/pypi/Flask-And-Redis/
     :alt: Python versions
 
-.. image:: https://pypip.in/license/Flask-And-Redis/badge.svg?style=flat
+.. image:: https://img.shields.io/pypi/l/Flask-And-Redis.svg
     :target: https://github.com/playpauseandstop/Flask-And-Redis/blob/master/LICENSE
     :alt: BSD License
 
