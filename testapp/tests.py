@@ -149,7 +149,12 @@ class TestFlaskAndRedis(TestCase):
                               REDIS_DB=TEST_REDIS_DB)
 
         redis.init_app(app)
-        redis.ping()
+
+        # Extensions initialized by init_app are not bound to any app
+        # So you need an application context to access it
+        self.assertRaises(RuntimeError, redis.ping)
+        with app.app_context():
+            redis.ping()
 
     def test_non_string_port(self):
         app = self.create_app(REDIS_HOST=TEST_REDIS_HOST,
@@ -178,3 +183,44 @@ class TestFlaskAndRedis(TestCase):
         app = self.create_app(REDIS_URL='redis://127.0.0.1:6379/0')
         redis = Redis(app)
         redis.ping()
+
+
+class TestMultipleAppSupport(TestCase):
+    def setUp(self):
+        self.redis = redis = Redis()
+        self.app_a = self.create_app(REDIS_URL='redis://127.0.0.1:6379/0')
+        self.app_b = self.create_app(REDIS_URL='redis://127.0.0.1:6379/1')
+        redis.init_app(self.app_a)
+        redis.init_app(self.app_b)
+
+    def create_app(self, **options):
+        defaults = {'TESTING': True}
+        defaults.update(options)
+
+        app = Flask('testapp')
+        app.config.update(defaults)
+
+        return app
+
+    def test_connections(self):
+        with self.app_a.app_context():
+            self.redis.ping()
+        with self.app_b.app_context():
+            self.redis.ping()
+
+    def test_different_values(self):
+        key = 'test:flask_redis:foo'
+        value_a = 'foo'
+        value_b = 'bar'
+
+        # Set key to different values in different apps
+        with self.app_a.app_context():
+            self.redis.set(key, value_a)
+        with self.app_b.app_context():
+            self.redis.set(key, value_b)
+
+        # Get key should produce different values in different apps
+        with self.app_a.app_context():
+            self.assertEqual(self.redis.get(key), value_a)
+        with self.app_b.app_context():
+            self.assertEqual(self.redis.get(key), value_b)
