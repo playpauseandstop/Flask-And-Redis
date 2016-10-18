@@ -33,6 +33,11 @@ class InheritFromStrictRedis(StrictRedis):
     """Dummy class inherited from Strict Redis."""
 
 
+def get_context(app):
+    creator = getattr(app, 'app_context', app.test_request_context)
+    return creator()
+
+
 @attr('testapp')
 class TestCommentsApp(FlaskTestCase):
 
@@ -153,7 +158,7 @@ class TestFlaskAndRedis(TestCase):
         # Extensions initialized by init_app are not bound to any app
         # So you need an application context to access it
         self.assertRaises(RuntimeError, redis.ping)
-        with app.app_context():
+        with get_context(app):
             redis.ping()
 
     def test_non_string_port(self):
@@ -188,8 +193,10 @@ class TestFlaskAndRedis(TestCase):
 class TestMultipleAppSupport(TestCase):
     def setUp(self):
         self.redis = redis = Redis()
-        self.app_a = self.create_app(REDIS_URL='redis://127.0.0.1:6379/0')
-        self.app_b = self.create_app(REDIS_URL='redis://127.0.0.1:6379/1')
+        self.app_a = self.create_app(REDIS_URL='redis://127.0.0.1:6379/0',
+                                     REDIS_DECODE_RESPONSES=True)
+        self.app_b = self.create_app(REDIS_URL='redis://127.0.0.1:6379/1',
+                                     REDIS_DECODE_RESPONSES=True)
         redis.init_app(self.app_a)
         redis.init_app(self.app_b)
 
@@ -203,9 +210,9 @@ class TestMultipleAppSupport(TestCase):
         return app
 
     def test_connections(self):
-        with self.app_a.app_context():
+        with get_context(self.app_a):
             self.redis.ping()
-        with self.app_b.app_context():
+        with get_context(self.app_b):
             self.redis.ping()
 
     def test_different_values(self):
@@ -214,13 +221,13 @@ class TestMultipleAppSupport(TestCase):
         value_b = 'bar'
 
         # Set key to different values in different apps
-        with self.app_a.app_context():
+        with get_context(self.app_a):
             self.redis.set(key, value_a)
-        with self.app_b.app_context():
+        with get_context(self.app_b):
             self.redis.set(key, value_b)
 
         # Get key should produce different values in different apps
-        with self.app_a.app_context():
+        with get_context(self.app_a):
             self.assertEqual(self.redis.get(key), value_a)
-        with self.app_b.app_context():
+        with get_context(self.app_b):
             self.assertEqual(self.redis.get(key), value_b)
