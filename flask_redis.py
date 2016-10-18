@@ -15,6 +15,7 @@ try:
 except ImportError:  # pragma: no cover
     import urlparse
 
+from flask import current_app
 from redis import StrictRedis
 from werkzeug.utils import import_string
 
@@ -53,6 +54,8 @@ class Redis(object):
         :param app: :class:`flask.Flask` application instance.
         :param config_prefix: Config prefix to use. By default: ``REDIS``
         """
+        self.app = app
+
         if app is not None:
             self.init_app(app, config_prefix)
 
@@ -126,7 +129,7 @@ class Redis(object):
                        if key(arg.upper()) in app.config])
 
         # Initialize connection and store it to extensions
-        self.connection = connection = klass(**kwargs)
+        connection = klass(**kwargs)
         app.extensions['redis'][config_prefix] = connection
 
         # Include public methods to current instance
@@ -141,4 +144,15 @@ class Redis(object):
             value = getattr(connection, attr)
             if attr.startswith('_') or not callable(value):
                 continue
-            self.__dict__[attr] = value
+            self.__dict__[attr] = self._get_connection_callable(attr)
+
+    def _get_connection_callable(self, name):
+        def _callable(*args, **kwargs):
+            value = getattr(self.connection, name)
+            return value(*args, **kwargs)
+        return _callable
+
+    @property
+    def connection(self):
+        app = self.app or current_app
+        return app.extensions['redis'][self.config_prefix]
