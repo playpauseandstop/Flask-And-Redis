@@ -25,7 +25,7 @@ from compat import iteritems
 
 
 def create_app(**options):
-    """Factory function to create test application.
+    r"""Factory function to create test application.
 
     :param \*\*options: Override default settings from given options.
     :type \*\*options: dict

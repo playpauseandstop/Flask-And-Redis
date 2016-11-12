@@ -1,101 +1,62 @@
 language: python
 services: redis-server
-
-python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - pypy
-
 env:
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.4.13
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.6.2
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.7.6
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.8.0
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.9.1
-  - FLASK_VERSION=0.8 REDIS_VERSION=2.10.3
+  - TOXENV=py26-flask08-redis24
+  - TOXENV=py26-flask08-redis26
+  - TOXENV=py26-flask08-redis27
+  - TOXENV=py26-flask08-redis28
+  - TOXENV=py26-flask08-redis29
+  - TOXENV=py26-flask08-redis210
+  - TOXENV=py26-flask09-redis24
+  - TOXENV=py26-flask09-redis26
+  - TOXENV=py26-flask09-redis27
+  - TOXENV=py26-flask09-redis28
+  - TOXENV=py26-flask09-redis29
+  - TOXENV=py26-flask09-redis210
+  - TOXENV=py26-flask010-redis24
+  - TOXENV=py26-flask010-redis26
+  - TOXENV=py26-flask010-redis27
+  - TOXENV=py26-flask010-redis28
+  - TOXENV=py26-flask010-redis29
+  - TOXENV=py26-flask010-redis210
+  - TOXENV=py26-flask011-redis24
+  - TOXENV=py26-flask011-redis26
+  - TOXENV=py26-flask011-redis27
+  - TOXENV=py26-flask011-redis28
+  - TOXENV=py26-flask011-redis29
+  - TOXENV=py26-flask011-redis210
 
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.4.13
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.6.2
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.7.6
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.8.0
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.9.1
-  - FLASK_VERSION=0.9 REDIS_VERSION=2.10.3
-
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.4.13
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.6.2
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.7.6
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.8.0
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.9.1
-  - FLASK_VERSION=0.10.1 REDIS_VERSION=2.10.3
+  - TOXENV=py27-flask08-redis24
+  - TOXENV=py27-flask08-redis26
+  - TOXENV=py27-flask08-redis27
+  - TOXENV=py27-flask08-redis28
+  - TOXENV=py27-flask08-redis29
+  - TOXENV=py27-flask08-redis210
+  - TOXENV=py27-flask09-redis24
+  - TOXENV=py27-flask09-redis26
+  - TOXENV=py27-flask09-redis27
+  - TOXENV=py27-flask09-redis28
+  - TOXENV=py27-flask09-redis29
+  - TOXENV=py27-flask09-redis210
+  - TOXENV=py27-flask010-redis24
+  - TOXENV=py27-flask010-redis26
+  - TOXENV=py27-flask010-redis27
+  - TOXENV=py27-flask010-redis28
+  - TOXENV=py27-flask010-redis29
+  - TOXENV=py27-flask010-redis210
+  - TOXENV=py27-flask011-redis24
+  - TOXENV=py27-flask011-redis26
+  - TOXENV=py27-flask011-redis27
+  - TOXENV=py27-flask011-redis28
+  - TOXENV=py27-flask011-redis29
+  - TOXENV=py27-flask011-redis210
 
 install:
-  - pip install -r testapp/requirements.txt
-  - pip install -I Flask==$FLASK_VERSION redis==$REDIS_VERSION
-  - if [[ $TRAVIS_PYTHON_VERSION == "2.6" ]]; then pip install ordereddict==1.1 unittest2==0.5.1; fi
-  - pip install -e .
+  - pip install tox
 
-script: "make -C testapp/ test"
+script:
+  - tox
 
 matrix:
   allow_failures:
-    - python: pypy
-  exclude:
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.4.13
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.6.2
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.7.6
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.8.0
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.9.1
-    - python: 3.3
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.10.3
-
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.4.13
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.6.2
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.7.6
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.8.0
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.9.1
-    - python: 3.3
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.10.3
-
-    - python: 3.3
-      env: FLASK_VERSION=0.10.1 REDIS_VERSION=2.4.13
-
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.4.13
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.6.2
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.7.6
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.8.0
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.9.1
-    - python: 3.4
-      env: FLASK_VERSION=0.8 REDIS_VERSION=2.10.3
-
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.4.13
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.6.2
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.7.6
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.8.0
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.9.1
-    - python: 3.4
-      env: FLASK_VERSION=0.9 REDIS_VERSION=2.10.3
-
-    - python: 3.4
-      env: FLASK_VERSION=0.10.1 REDIS_VERSION=2.4.13
+    - env: TOXENV=pypy-flask08-

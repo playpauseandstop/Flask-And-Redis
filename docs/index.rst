@@ -155,6 +155,13 @@ API
 Changelog
 =========
 
+0.7 (2016-11-12)
+----------------
+
+* Improve multiple app support. Kudos to `timothyqiu <https://github.com/timothyqiu>`_
+  for pull request & implementation
+* Simplify running tests for test application
+
 0.6 (2015-01-08)
 ----------------
 

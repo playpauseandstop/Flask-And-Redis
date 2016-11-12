@@ -8,15 +8,11 @@ ENV ?= env
 VENV = $(shell python -c 'import sys; print(int(hasattr(sys, "real_prefix")));')
 
 ifeq ($(VENV),1)
-	IPYTHON = PYTHONPATH=.:.. ipython
-	NOSETESTS = PYTHONPATH=.:.. nosetests
-	PEP8 = flake8
-	PYTHON = PYTHONPATH=.:.. python
+	PYTHON = python
+	TOX = tox
 else
-	IPYTHON = PYTHONPATH=.:.. $(ENV)/bin/ipython
-	NOSETESTS = PYTHONPATH=.:.. $(ENV)/bin/nosetests
-	PEP8 = $(ENV)/bin/flake8
-	PYTHON = PYTHONPATH=.:.. $(ENV)/bin/python
+	PYTHON = $(ENV)/bin/python
+	TOX = $(ENV)/bin/tox
 endif
 
 # Server settings
@@ -24,10 +20,9 @@ SERVER_HOST ?= 0.0.0.0
 SERVER_PORT ?= 8300
 
 # Test settings
-COVERAGE_DIR ?= /tmp/$(APP)-coverage
-
-bootstrap:
-	bootstrapper -e $(ENV)/
+ifneq ($(TOXENV),)
+	tox_args = -e $(TOXENV)
+endif
 
 clean:
 	find . -name "*.pyc" -delete
@@ -37,22 +32,22 @@ clean:
 distclean: clean
 	rm -rf ../build ../dist $(ENV)/
 
-pep8:
-	$(PEP8) ../$(APP).py
-	$(PEP8) --exclude=$(ENV) $(PROJECT)
+install: .install
+.install: requirements.txt
+	bootstrapper -e $(ENV)/
+	touch $@
 
-server: clean pep8
+lint: .install
+	TOXENV=flake8 $(MAKE) test
+
+server: .install
 	$(PYTHON) app.py $(SERVER_HOST):$(SERVER_PORT)
 
 shell:
-	$(IPYTHON) --deep-reload --no-banner --no-confirm-exit --pprint
+	$(PYTHON) -m ipython
 
-test: clean pep8
-	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
-	-a "!testapp" --with-coverage --cover-branches --cover-erase \
-	--cover-package=$(APP) --cover-html --cover-html-dir="$(COVERAGE_DIR)"
-	$(NOSETESTS) --logging-clear-handlers $(TEST_ARGS) -w $(PROJECT)/ \
-	-a testapp
+test: .install
+	$(TOX) $(tox_args) $(TOX_ARGS) -- $(TEST_ARGS)
 
-wipe:
+wipe: .install
 	$(PYTHON) wipe.py
