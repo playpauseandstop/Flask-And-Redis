@@ -2,7 +2,8 @@ language: python
 services: redis-server
 
 install:
-  - pip install tox
+  - pip install coveralls tox
 
 script:
   - tox
+  - coveralls
