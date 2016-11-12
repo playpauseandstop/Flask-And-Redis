@@ -2,8 +2,17 @@ language: python
 services: redis-server
 
 install:
-  - pip install coveralls tox
+- pip install coveralls tox
 
 script:
-  - tox
-  - coveralls
+- tox
+- coveralls
+
+deploy:
+  provider: pypi
+  user: playpauseandstop
+  password:
+    secure: adlnY9sKpfJPdcpnh0SuhQ4iIbZozQ4uNMJ/UgAra4ft4FfiDhYKqqbz58mX0PSKhLcaA0RAeLeesMqqiKrEBRmmQeu7k/pM5kw3Z57B7H/zMIoHDqgbdUMvM3Jf6PZrgx5qat48ECGZHz0ImvQzwfr98i1k+wmJM5on2X6pWgU=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
