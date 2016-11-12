@@ -15,6 +15,12 @@ try:
 except ImportError:  # pragma: no cover
     import urlparse
 
+from flask import _request_ctx_stack
+try:
+    from flask import _app_ctx_stack
+except ImportError:
+    _app_ctx_stack = None
+
 from redis import StrictRedis
 from werkzeug.utils import import_string
 
@@ -29,6 +35,9 @@ __version__ = '0.6'
 
 IS_PY3 = sys.version_info[0] == 3
 string_types = (str if IS_PY3 else basestring, )  # noqa
+
+# Which stack should we use? _app_ctx_stack is new in 0.9
+connection_stack = _app_ctx_stack or _request_ctx_stack
 
 
 class Redis(object):
@@ -53,6 +62,8 @@ class Redis(object):
         :param app: :class:`flask.Flask` application instance.
         :param config_prefix: Config prefix to use. By default: ``REDIS``
         """
+        self.app = app
+
         if app is not None:
             self.init_app(app, config_prefix)
 
@@ -126,7 +137,7 @@ class Redis(object):
                        if key(arg.upper()) in app.config])
 
         # Initialize connection and store it to extensions
-        self.connection = connection = klass(**kwargs)
+        connection = klass(**kwargs)
         app.extensions['redis'][config_prefix] = connection
 
         # Include public methods to current instance
@@ -141,4 +152,29 @@ class Redis(object):
             value = getattr(connection, attr)
             if attr.startswith('_') or not callable(value):
                 continue
-            self.__dict__[attr] = value
+            self.__dict__[attr] = self._get_connection_callable(attr)
+
+    def _get_connection_callable(self, name):
+        def _callable(*args, **kwargs):
+            value = getattr(self.connection, name)
+            return value(*args, **kwargs)
+        return _callable
+
+    @property
+    def connection(self):
+        app = self.get_app()
+        return app.extensions['redis'][self.config_prefix]
+
+    def get_app(self):
+        ctx = connection_stack.top
+
+        if ctx is not None:
+            return ctx.app
+
+        if self.app is not None:
+            return self.app
+
+        raise RuntimeError(
+            'application not registered on Redis instance '
+            'and no applcation bound to current context'
+        )
