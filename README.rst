@@ -6,6 +6,10 @@ Flask-And-Redis
     :target: https://travis-ci.org/playpauseandstop/Flask-And-Redis
     :alt: Travis CI
 
+.. image:: https://coveralls.io/repos/github/playpauseandstop/Flask-And-Redis/badge.svg?branch=master
+    :target: https://coveralls.io/github/playpauseandstop/Flask-And-Redis?branch=master
+    :alt: Coverage
+
 .. image:: https://img.shields.io/pypi/v/Flask-And-Redis.svg
     :target: https://pypi.python.org/pypi/Flask-And-Redis/
     :alt: Latest Version
