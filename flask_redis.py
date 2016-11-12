@@ -15,12 +15,12 @@ try:
 except ImportError:  # pragma: no cover
     import urlparse
 
-from flask import _request_ctx_stack
 try:
     from flask import _app_ctx_stack
-except ImportError:
+except ImportError:  # pragma: no cover
     _app_ctx_stack = None
 
+from flask import _request_ctx_stack
 from redis import StrictRedis
 from werkzeug.utils import import_string
 
@@ -30,7 +30,7 @@ __all__ = ('Redis', )
 
 __author = 'Igor Davydenko'
 __license__ = 'BSD License'
-__version__ = '0.6'
+__version__ = '0.7'
 
 
 IS_PY3 = sys.version_info[0] == 3
@@ -67,6 +67,32 @@ class Redis(object):
         if app is not None:
             self.init_app(app, config_prefix)
 
+    @property
+    def connection(self):
+        """Return Redis connection for current app."""
+        return self.get_app().extensions['redis'][self.config_prefix]
+
+    def get_app(self):
+        """Get current app from Flast stack to use.
+
+        This will allow to ensure which Redis connection to be used when
+        accessing Redis connection public methods via plugin.
+        """
+        # First see to connection stack
+        ctx = connection_stack.top
+        if ctx is not None:
+            return ctx.app
+
+        # Next return app from instance cache
+        if self.app is not None:
+            return self.app
+
+        # Something went wrong, in most cases app just not instantiated yet
+        # and we cannot locate it
+        raise RuntimeError(
+            'Flask application not registered on Redis instance '
+            'and no applcation bound to current context')
+
     def init_app(self, app, config_prefix=None):
         """
         Actual method to read redis settings from app configuration, initialize
@@ -94,7 +120,7 @@ class Redis(object):
         convert = lambda arg, value: (converters[arg](value)
                                       if arg in converters
                                       else value)
-        key = lambda suffix: '{0}_{1}'.format(config_prefix, suffix)
+        key = lambda param: '{0}_{1}'.format(config_prefix, param)
 
         # Which redis connection class to use?
         klass = app.config.get(key('CLASS'), StrictRedis)
@@ -152,29 +178,13 @@ class Redis(object):
             value = getattr(connection, attr)
             if attr.startswith('_') or not callable(value):
                 continue
-            self.__dict__[attr] = self._get_connection_callable(attr)
+            self.__dict__[attr] = self._wrap_public_method(attr)
 
-    def _get_connection_callable(self, name):
-        def _callable(*args, **kwargs):
-            value = getattr(self.connection, name)
-            return value(*args, **kwargs)
-        return _callable
-
-    @property
-    def connection(self):
-        app = self.get_app()
-        return app.extensions['redis'][self.config_prefix]
-
-    def get_app(self):
-        ctx = connection_stack.top
-
-        if ctx is not None:
-            return ctx.app
-
-        if self.app is not None:
-            return self.app
-
-        raise RuntimeError(
-            'application not registered on Redis instance '
-            'and no applcation bound to current context'
-        )
+    def _wrap_public_method(self, attr):
+        """
+        Ensure that plugin will call current connection method when accessing
+        as ``plugin.<public_method>(*args, **kwargs)``.
+        """
+        def wrapper(*args, **kwargs):
+            return getattr(self.connection, attr)(*args, **kwargs)
+        return wrapper
