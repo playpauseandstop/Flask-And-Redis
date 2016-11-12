@@ -233,3 +233,4 @@ Authors
   code)
 * `Lexo Charles <https://github.com/sixpoint>`_
 * `Hidetaka Yamashita <https://github.com/weboo>`_
+* `Timothy Qiu <https://github.com/timothyqiu>`_
