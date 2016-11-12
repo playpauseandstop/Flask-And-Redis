@@ -1,62 +1,8 @@
 language: python
 services: redis-server
-env:
-  - TOXENV=py26-flask08-redis24
-  - TOXENV=py26-flask08-redis26
-  - TOXENV=py26-flask08-redis27
-  - TOXENV=py26-flask08-redis28
-  - TOXENV=py26-flask08-redis29
-  - TOXENV=py26-flask08-redis210
-  - TOXENV=py26-flask09-redis24
-  - TOXENV=py26-flask09-redis26
-  - TOXENV=py26-flask09-redis27
-  - TOXENV=py26-flask09-redis28
-  - TOXENV=py26-flask09-redis29
-  - TOXENV=py26-flask09-redis210
-  - TOXENV=py26-flask010-redis24
-  - TOXENV=py26-flask010-redis26
-  - TOXENV=py26-flask010-redis27
-  - TOXENV=py26-flask010-redis28
-  - TOXENV=py26-flask010-redis29
-  - TOXENV=py26-flask010-redis210
-  - TOXENV=py26-flask011-redis24
-  - TOXENV=py26-flask011-redis26
-  - TOXENV=py26-flask011-redis27
-  - TOXENV=py26-flask011-redis28
-  - TOXENV=py26-flask011-redis29
-  - TOXENV=py26-flask011-redis210
-
-  - TOXENV=py27-flask08-redis24
-  - TOXENV=py27-flask08-redis26
-  - TOXENV=py27-flask08-redis27
-  - TOXENV=py27-flask08-redis28
-  - TOXENV=py27-flask08-redis29
-  - TOXENV=py27-flask08-redis210
-  - TOXENV=py27-flask09-redis24
-  - TOXENV=py27-flask09-redis26
-  - TOXENV=py27-flask09-redis27
-  - TOXENV=py27-flask09-redis28
-  - TOXENV=py27-flask09-redis29
-  - TOXENV=py27-flask09-redis210
-  - TOXENV=py27-flask010-redis24
-  - TOXENV=py27-flask010-redis26
-  - TOXENV=py27-flask010-redis27
-  - TOXENV=py27-flask010-redis28
-  - TOXENV=py27-flask010-redis29
-  - TOXENV=py27-flask010-redis210
-  - TOXENV=py27-flask011-redis24
-  - TOXENV=py27-flask011-redis26
-  - TOXENV=py27-flask011-redis27
-  - TOXENV=py27-flask011-redis28
-  - TOXENV=py27-flask011-redis29
-  - TOXENV=py27-flask011-redis210
 
 install:
   - pip install tox
 
 script:
   - tox
-
-matrix:
-  allow_failures:
-    - env: TOXENV=pypy-flask08-
