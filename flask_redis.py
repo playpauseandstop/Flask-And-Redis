@@ -154,7 +154,10 @@ class Redis(object):
             app.config[key('UNIX_SOCKET_PATH')] = host
 
         # Read connection args spec, exclude self from list of possible
-        args = inspect.getargspec(klass.__init__).args
+        try:
+            args = inspect.getfullargspec(klass.__init__).args
+        except AttributeError:
+            args = inspect.getargspec(klass.__init__).args
         args.remove('self')
 
         # Prepare keyword arguments
