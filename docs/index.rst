@@ -7,7 +7,7 @@ database for `Flask <http://flask.pocoo.org/>`_ applications. Extension built
 around beautiful `redis-py <https://github.com/andymccurdy/redis-py>`_ library
 by Andy McCurdy.
 
-* Works on Python 2.6, 2.7, 3.3+
+* Works on Python 2.7, 3.4+
 * BSD licensed
 * Latest documentation `on Read the Docs
   <http://flask-and-redis.readthedocs.org>`_

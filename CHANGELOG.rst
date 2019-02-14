@@ -1,7 +1,7 @@
 1.0 (2019-02-14)
 ----------------
 
-* Drop Python 2.6 support + ensure Python 3.6+ support. Kudos to
+* Drop Python 2.6 & 3.3 support, ensure Python 3.6+ support. Kudos to
   `jezdez <https://github.com/jezdez>`_ for pull request & implementation
 * Use `inspect.getfullargspec()` if available. Kudos to
   `vibiu <https://github.com/vibiu>`_ for pull request & implementation
