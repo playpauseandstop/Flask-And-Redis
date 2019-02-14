@@ -153,27 +153,7 @@ class Redis(object):
             app.config.pop(key('HOST'))
             app.config[key('UNIX_SOCKET_PATH')] = host
 
-        # Read connection args spec, exclude self from list of possible
-        all_klasses = [klass] + [
-            subklass
-            for subklass in klass.__bases__
-            if subklass is not object
-        ]
-
-        all_args = []
-        for subklass in all_klasses:
-            try:
-                args = inspect.getfullargspec(subklass.__init__).args
-            except AttributeError:
-                args = inspect.getargspec(subklass.__init__).args
-            for arg in args:
-                if arg in args:
-                    continue
-                all_args.append(arg)
-
-        args.remove('self')
-
-        # Prepare keyword arguments
+        args = self._build_connection_args(klass)
         kwargs = dict([(arg, convert(arg, app.config[key(arg.upper())]))
                        for arg in args
                        if key(arg.upper()) in app.config])
@@ -184,6 +164,25 @@ class Redis(object):
 
         # Include public methods to current instance
         self._include_public_methods(connection)
+
+    def _build_connection_args(self, klass):
+        """Read connection args spec, exclude self from list of possible
+
+        :param klass: Redis connection class.
+        """
+        bases = [base for base in klass.__bases__ if base is not object]
+        all_args = []
+        for cls in [klass] + bases:
+            try:
+                args = inspect.getfullargspec(cls.__init__).args
+            except AttributeError:
+                args = inspect.getargspec(cls.__init__).args
+            for arg in args:
+                if arg in all_args:
+                    continue
+                all_args.append(arg)
+        all_args.remove('self')
+        return all_args
 
     def _include_public_methods(self, connection):
         """Include public methods from Redis connection to current instance.
