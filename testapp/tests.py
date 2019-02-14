@@ -33,6 +33,14 @@ class InheritFromStrictRedis(StrictRedis):
     """Dummy class inherited from Strict Redis."""
 
 
+class CustomInitStrictRedis(StrictRedis):
+    """Dummy class that has own __init__ defined"""
+
+    def __init__(self, foo="bar", *args, **kwargs):
+        super(CustomInitStrictRedis, self).__init__(*args, **kwargs)
+        self.foo = foo
+
+
 def get_context(app):
     creator = getattr(app, 'app_context', app.test_request_context)
     return creator()
@@ -120,6 +128,16 @@ class TestFlaskAndRedis(TestCase):
                               REDIS_URL=TEST_REDIS_URL)
         redis = Redis(app)
         redis.ping()
+
+    def test_class_custom_init(self):
+        app = self.create_app(REDIS_CLASS=CustomInitStrictRedis,
+                              REDIS_URL='redis://127.0.0.1:6379/1')
+        redis = Redis(app)
+        redis.ping()
+        self.assertEqual(redis.connection.foo, "bar")
+        self.assertEqual(
+            redis.connection.connection_pool.connection_kwargs['db'], '1'
+        )
 
     def test_class_from_string(self):
         app = self.create_app(REDIS_CLASS='redis.Redis',
