@@ -9,11 +9,11 @@ python:
 services: redis-server
 
 install:
-- pip install coveralls tox-travis
+- pip install coveralls==1.5.1 tox-travis==0.11
 
 script:
 - tox
-- coveralls
+- coveralls debug
 
 deploy:
   provider: pypi
