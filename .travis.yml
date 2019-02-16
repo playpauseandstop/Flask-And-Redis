@@ -13,7 +13,7 @@ install:
 
 script:
 - tox
-- coveralls debug
+- coveralls
 
 deploy:
   provider: pypi
