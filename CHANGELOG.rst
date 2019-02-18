@@ -1,5 +1,5 @@
-1.0.0 (In Development)
-----------------------
+1.0.0 (2019-02-18)
+------------------
 
 * Drop Python 2.6 & 3.3 support, ensure Python 3.6+ support. Kudos to
   `jezdez <https://github.com/jezdez>`_ for pull request & implementation
