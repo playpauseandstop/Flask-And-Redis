@@ -9,6 +9,8 @@ Tests for Flask-And-Redis extension and for Comments app.
 
 from unittest import TestCase
 
+import flask_redis
+import redis as redis_py
 from flask import Flask, url_for
 from flask_redis import Redis
 from flask_testing import TestCase as FlaskTestCase
@@ -162,6 +164,16 @@ class TestFlaskAndRedis(TestCase):
                               REDIS_DB=TEST_REDIS_DB)
         redis = Redis(app)
         redis.ping()
+
+    def test_default_class_redis_3(self):
+        app = self.create_app(REDIS_URL=TEST_REDIS_URL)
+
+        redis = Redis(app)
+        real_redis = app.extensions['redis']['REDIS']
+
+        self.assertIsInstance(
+            real_redis,
+            redis_py.Redis if flask_redis.IS_REDIS3 else StrictRedis)
 
     def test_init_app_behaviour(self):
         redis = Redis()

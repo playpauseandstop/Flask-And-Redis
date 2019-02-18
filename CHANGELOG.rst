@@ -1,5 +1,5 @@
-1.0 (In Development)
---------------------
+1.0.0 (In Development)
+----------------------
 
 * Drop Python 2.6 & 3.3 support, ensure Python 3.6+ support. Kudos to
   `jezdez <https://github.com/jezdez>`_ for pull request & implementation
@@ -7,6 +7,8 @@
   `jezdez  <https://github.com/jezdez>`_ for pull request & implementation
 * Use `inspect.getfullargspec()` if available. Kudos to
   `vibiu <https://github.com/vibiu>`_ for pull request & implementation
+* Use `redis.Redis` as default connection class, when using
+  `redis-py <https://github.com/andymccurdy/redis-py>`_ >= 3
 
 0.7 (2016-11-12)
 ----------------

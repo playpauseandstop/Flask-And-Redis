@@ -26,10 +26,6 @@ virtual environment::
 
     $ pip install Flask-And-Redis
 
-Otherwise you could download source dist from GitHub or PyPI and put
-``flask_redis.py`` file somewhere to ``$PYTHONPATH``, but this way is not
-recommended. Use pip for all good things.
-
 Usage
 =====
 
@@ -60,8 +56,8 @@ Configuration
 =============
 
 ``Flask-And-Redis`` understands all keyword arguments which should be passed
-to ``redis.StrictRedis`` or ``redis.Redis`` classes init method. In easiest way
-all you need is putting
+to ``redis.Redis`` (or ``redis.StrictRedis``, when using ``redis-py<3``)
+classes init method. In easiest way all you need is putting
 
 * ``REDIS_HOST``
 * ``REDIS_PORT``
@@ -104,6 +100,14 @@ or::
 
     REDIS_CLASS = 'redis.Redis'
     REDIS_CLASS = 'path.to.module.Redis'
+
+.. versionchanged:: 1.0.0
+
+As in ``redis==3.0.0`` release ``StrictRedis`` class renamed to ``Redis``
+once again, when you have redis-py 3 or any further version installed
+``Flask-And-Redis`` will use ``redis.Redis`` as default value for redis
+connection class to use. For previous redis-py releases ``redis.StrictRedis``
+still be used as default connection class.
 
 REDIS_URL
 ---------

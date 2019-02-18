@@ -15,13 +15,14 @@ try:
 except ImportError:  # pragma: no cover
     import urlparse
 
+import redis
+
 try:
     from flask import _app_ctx_stack
 except ImportError:  # pragma: no cover
     _app_ctx_stack = None
 
 from flask import _request_ctx_stack
-from redis import StrictRedis
 from werkzeug.utils import import_string
 
 
@@ -30,11 +31,15 @@ __all__ = ('Redis', )
 
 __author = 'Igor Davydenko'
 __license__ = 'BSD License'
-__version__ = '0.7'
+__version__ = '1.0.0a0'
 
 
 IS_PY3 = sys.version_info[0] == 3
+IS_REDIS3 = redis.VERSION[0] == 3
 string_types = (str if IS_PY3 else basestring, )  # noqa
+
+# Default Redis connection class
+RedisClass = redis.Redis if IS_REDIS3 else redis.StrictRedis
 
 # Which stack should we use? _app_ctx_stack is new in 0.9
 connection_stack = _app_ctx_stack or _request_ctx_stack
@@ -123,7 +128,7 @@ class Redis(object):
         key = lambda param: '{0}_{1}'.format(config_prefix, param)
 
         # Which redis connection class to use?
-        klass = app.config.get(key('CLASS'), StrictRedis)
+        klass = app.config.get(key('CLASS'), RedisClass)
 
         # Import connection class if it stil path notation
         if isinstance(klass, string_types):
