@@ -15,13 +15,12 @@ try:
 except ImportError:  # pragma: no cover
     import urlparse
 
-import redis
-
 try:
     from flask import _app_ctx_stack
 except ImportError:  # pragma: no cover
     _app_ctx_stack = None
 
+import redis
 from flask import _request_ctx_stack
 from werkzeug.utils import import_string
 
