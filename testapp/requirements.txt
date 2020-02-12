@@ -1,4 +1,4 @@
 -e ..
 
-ipython==5.1.0
+ipython==7.12.0
 tox==2.4.1
