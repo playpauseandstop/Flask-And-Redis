@@ -1,0 +1,21 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[{.babelrc,.compressrc,.eslintrc}]
+indent_size = 2
+
+[*.{css,cfg,html,ini,js,json,md,service,toml,yaml,yml,xml}]
+indent_size = 2
+
+[*.{elm,nginx,py,rst,sh}]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+tab_width = 4

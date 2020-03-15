@@ -1,0 +1,6 @@
+[flake8]
+application-import-names = api, scripts
+exclude = migrations/*
+import-order-style = smarkets
+inline-quotes = double
+max_complexity = 15
