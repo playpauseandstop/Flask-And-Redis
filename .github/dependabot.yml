@@ -1,0 +1,24 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "03:00"
+  open-pull-requests-limit: 10
+  reviewers:
+  - playpauseandstop
+  assignees:
+  - playpauseandstop
+  ignore:
+  - dependency-name: ipython
+    versions:
+    - 7.19.0
+    - 7.20.0
+    - 7.21.0
+  - dependency-name: tox
+    versions:
+    - 3.21.2
+    - 3.21.3
+    - 3.21.4
+    - 3.22.0
