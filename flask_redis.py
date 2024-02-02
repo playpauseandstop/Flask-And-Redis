@@ -21,7 +21,7 @@ except ImportError:  # pragma: no cover
     _app_ctx_stack = None
 
 import redis
-from flask import _request_ctx_stack
+from flask.globals import request_ctx
 from werkzeug.utils import import_string
 
 
@@ -40,8 +40,7 @@ string_types = (str if IS_PY3 else basestring, )  # noqa
 # Default Redis connection class
 RedisClass = redis.Redis if IS_REDIS3 else redis.StrictRedis
 
-# Which stack should we use? _app_ctx_stack is new in 0.9
-connection_stack = _app_ctx_stack or _request_ctx_stack
+connection_stack = request_ctx
 
 
 class Redis(object):
@@ -83,7 +82,7 @@ class Redis(object):
         accessing Redis connection public methods via plugin.
         """
         # First see to connection stack
-        ctx = connection_stack.top
+        ctx = connection_stack
         if ctx is not None:
             return ctx.app
 
